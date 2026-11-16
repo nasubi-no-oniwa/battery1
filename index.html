@@ -100,6 +100,18 @@ html,body{margin:0;height:100%;background:#000;color:var(--txt);font-family:-app
 .ngl s{color:#8b9098;text-decoration:none}
 .ngl u{text-decoration:none;color:#ff8a80;font-weight:700}
 .dev{display:inline-block;margin-top:8px;font-size:12px;color:var(--sub);border:1px solid #333;border-radius:20px;padding:2px 10px}
+#recBox input{width:100%;margin-top:14px;font-size:16px;border-radius:12px;border:1px solid #3a3d44;background:#0d0e11;color:#fff;padding:11px;text-align:center;font-family:inherit;outline:none}
+.sub.rec{background:var(--yel);color:#1a1a1a}
+.note{font-size:13px;min-height:1.2em;margin-top:6px;color:#c9ccd2}.note.err{color:#ff8a80}.note.ok{color:#7dff9b}
+.tabs{display:flex;gap:6px;margin-top:10px}.tabs button{flex:1;padding:8px;border:none;border-radius:10px;background:#2a2d34;color:#c9ccd2;font-weight:800;font-family:inherit;font-size:14px}.tabs button.on{background:#fff;color:#000}
+#rankBox{margin-top:8px;max-height:48vh;overflow:auto;text-align:left}
+table.rk{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+table.rk td{padding:7px 4px;border-bottom:1px solid #22252b}
+table.rk td.r{color:var(--yel);font-weight:900;width:2.6em}
+table.rk td.n{max-width:10em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+table.rk td.c{text-align:right;font-weight:800;white-space:nowrap}
+table.rk td.c small{color:var(--sub);font-weight:400;margin-left:4px}
+table.rk tr.me td{background:#3a3418}
 /* 電源オフ */
 #off{position:fixed;inset:0;z-index:50;background:#000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none}
 #off.on{opacity:1;pointer-events:auto}
@@ -129,6 +141,16 @@ html,body{margin:0;height:100%;background:#000;color:var(--txt);font-family:-app
   <div id="toast"><b>バッテリー残量が少なくなっています</b>残り1%です。電源に接続してください。</div>
   <div id="dim"></div>
 </div>
+<div class="panel" id="rank" hidden>
+  <div class="card">
+    <div style="font-weight:900;font-size:20px">ランキング</div>
+    <div class="tabs" id="rkPf"><button data-p="m">スマホ</button><button data-p="p">PC</button></div>
+    <div class="tabs" id="rkWhen"><button data-w="d">今日</button><button data-w="all">全期間</button></div>
+    <div class="res-s" style="font-size:12px">クリアしたお題が多い順（同じなら誤送信が少ない人が上）</div>
+    <div id="rankBox"></div>
+    <button class="sub" id="rkBack">もどる</button>
+  </div>
+</div>
 <div id="off"><div class="ln"></div><div class="zero">0%</div></div>
 
 <div class="panel" id="title">
@@ -137,6 +159,7 @@ html,body{margin:0;height:100%;background:#000;color:var(--txt);font-family:-app
     <h1>残り<em>1%</em></h1>
     <p class="lead">夜中、スマホのバッテリーは <b>1%</b>。<br>あと<b>60秒</b>で電源が落ちる。<br>上に出るお題どおりに、急いでLINEを返せ。<br>送る文は<b>自分で打つ</b>。打ちまちがえても、もう送信は取り消せない。</p>
     <button class="big" id="go">はじめる</button>
+    <button class="sub" id="rkBtn">ランキング</button>
     <div class="dev" id="devT"></div>
   </div>
 </div>
@@ -147,8 +170,10 @@ html,body{margin:0;height:100%;background:#000;color:var(--txt);font-family:-app
     <div class="res-n"><span id="rN">0</span><small>個クリア</small></div>
     <div class="res-s" id="rSub"></div>
     <div class="ngl" id="rNg" hidden></div>
+    <div id="recBox"><input id="nm" maxlength="12" placeholder="名前（12文字まで）" autocomplete="off"><button class="sub rec" id="recBtn">ランキングに記録する</button><div class="note" id="recNote"></div></div>
     <a class="sub x" id="xBtn" target="_blank" rel="noopener">𝕏 に投稿</a>
     <button class="big" id="again">もう一度</button>
+    <button class="sub" id="rkBtn2">ランキング</button>
     <div class="dev" id="devR"></div>
   </div>
 </div>
@@ -437,12 +462,89 @@ function showResult() {
 }
 function start() {
  init(); renderList(); closeRoom(); $('cnt').textContent = 0; $('off').classList.remove('on'); $('dim').style.opacity = 0;
- $('title').hidden = true; $('result').hidden = true; toastShown = 0; odai = null;
+ $('title').hidden = true; $('result').hidden = true; $('rank').hidden = true; toastShown = 0; odai = null;
  st.live = true; tStart = performance.now(); raf = requestAnimationFrame(loop);
  nextOdai(); noiseT = setTimeout(noise, 2500);
+ netStart().catch(() => { RUN = null; });
+ $('recBtn').disabled = false; $('recNote').textContent = '';
 }
 $('go').addEventListener('click', start);
 $('again').addEventListener('click', start);
+
+
+// ---------- ランキング（ft-red の battery1） ----------
+const ls = { get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v) } catch (e) { return d } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)) } catch (e) { } } };
+const FB = { key: 'AIzaSyBCzVyblBmfNQq4XdPHdQppE94gyiYxDkA', db: 'https://ft-red-default-rtdb.asia-southeast1.firebasedatabase.app' };
+const PF = IS_MOBILE ? 'm' : 'p';
+const NG_WORDS = ['ちんこ','ちんぽ','まんこ','せっくす','セックス','きんたま','レイプ','死ね','しね','殺す','ころす','ガイジ','キチガイ','きちがい','ニガー','チョン','支那','fuck','shit','bitch','cunt','dick','pussy','nigger','nigga','faggot','retard','whore','slut','rape','porn','nazi','hitler'];
+const badName = s => { const n = s.normalize('NFKC').toLowerCase().replace(/[\s・._\-ー〜~!！?？*＊]/g, ''); return NG_WORDS.some(w => n.includes(w.normalize('NFKC').toLowerCase())); };
+async function fx(url, opt) { let err; for (let i = 0; i < 3; i++) { try { return await fetch(url, opt); } catch (e) { err = e; await new Promise(r => setTimeout(r, 500 * (i + 1))); } } throw err; }
+let AUTH = null;
+async function auth() {
+ let a = AUTH || ls.get('b1_auth', null); if (a && a.exp > Date.now() + 60000) return AUTH = a;
+ if (a && a.refresh) { try { const r = await fx('https://securetoken.googleapis.com/v1/token?key=' + FB.key, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'grant_type=refresh_token&refresh_token=' + encodeURIComponent(a.refresh) }); if (r.ok) { const j = await r.json(); a = { uid: j.user_id, token: j.id_token, refresh: j.refresh_token, exp: Date.now() + (+j.expires_in) * 1000 }; ls.set('b1_auth', a); return AUTH = a; } } catch (_) { } }
+ const r = await fx('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=' + FB.key, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ returnSecureToken: true }) });
+ if (!r.ok) throw new Error('auth'); const j = await r.json(); a = { uid: j.localId, token: j.idToken, refresh: j.refreshToken, exp: Date.now() + (+j.expiresIn) * 1000 }; ls.set('b1_auth', a); return AUTH = a;
+}
+const DB = p => FB.db + '/battery1/' + p + '.json';
+const QA = a => '?auth=' + encodeURIComponent(a.token);
+const PUT = (url, body) => fx(url, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+const TS = { '.sv': 'timestamp' };
+const dayKey = ms => Math.floor((ms + 32400000) / 86400000);
+let RUN = null;
+async function netStart() {
+ RUN = null; const a = await auth();
+ const r = await PUT(DB('run/' + a.uid) + QA(a), { st: TS, pf: PF }); if (!r.ok) throw new Error('run'); const j = await r.json(); RUN = { st: j.st };
+}
+async function submit(nm) {
+ if (!RUN) throw new Error('norun');
+ const a = await auth(), k = st.n, e = Math.min(999, st.ng.length), sk = k * 1000 + 999 - e;
+ const rec = { n: nm, k, e, sk, st: RUN.st, v: 1, at: TS };
+ const dk = dayKey(Date.now()), recD = { ...rec, dk, ds: dk * 1000000 + sk };
+ const get = p => fx(DB(p)).then(x => x.ok ? x.json() : null).catch(() => null);
+ const [old, oldD] = await Promise.all([get('b/' + PF + '/all/' + a.uid), get('b/' + PF + '/d/' + a.uid)]);
+ const okA = !old || sk > old.sk, okD = !oldD || oldD.dk !== dk || sk > oldD.sk;
+ if (okD) { const r = await PUT(DB('b/' + PF + '/d/' + a.uid) + QA(a), recD); if (!r.ok) throw new Error('d'); }
+ if (okA) { const r = await PUT(DB('b/' + PF + '/all/' + a.uid) + QA(a), rec); if (!r.ok) throw new Error('all'); }
+ const [rd, ra] = await Promise.all([board(PF, 'd'), board(PF, 'all')]);
+ const f = rows => { const x = rows.find(r => r.id === a.uid); return x ? x.rk + '位' : '100位より下'; };
+ return '今日 ' + f(rd) + '・全期間 ' + f(ra) + (okA ? '' : '（全期間は前の記録のほうが上）');
+}
+async function board(pf, when) {
+ const dk = dayKey(Date.now());
+ const q = when === 'd' ? '?orderBy="ds"&startAt=' + dk * 1000000 + '&endAt=' + (dk * 1000000 + 999999) + '&limitToLast=100' : '?orderBy="sk"&limitToLast=100';
+ const r = await fx(DB('b/' + pf + '/' + when) + q); if (!r.ok) throw new Error('board');
+ const o = await r.json() || {};
+ const rows = Object.keys(o).map(id => ({ id, ...o[id] })).filter(x => typeof x.sk === 'number' && x.sk === x.k * 1000 + 999 - x.e);
+ rows.sort((a, b) => b.sk - a.sk || a.at - b.at);
+ let rk = 0, prev = null; rows.forEach((x, i) => { if (x.sk !== prev) { rk = i + 1; prev = x.sk; } x.rk = rk; });
+ return rows;
+}
+let RKS = { pf: PF, when: 'd', from: 'title' };
+async function openRank(pf, when, from) {
+ const my = RKS = { pf, when, from: from || RKS.from };
+ $('title').hidden = true; $('result').hidden = true; $('rank').hidden = false;
+ $('rkPf').querySelectorAll('button').forEach(b => { b.className = b.dataset.p === pf ? 'on' : ''; b.onclick = () => openRank(b.dataset.p, RKS.when); });
+ $('rkWhen').querySelectorAll('button').forEach(b => { b.className = b.dataset.w === when ? 'on' : ''; b.onclick = () => openRank(RKS.pf, b.dataset.w); });
+ const box = $('rankBox'); box.innerHTML = '<p class="note">読み込み中…</p>';
+ try {
+  const rows = await board(pf, when); if (RKS !== my) return;
+  const me = (ls.get('b1_auth', null) || {}).uid;
+  box.innerHTML = rows.length ? '<table class="rk">' + rows.map(r => `<tr${r.id === me ? ' class="me"' : ''}><td class="r">${r.rk}</td><td class="n">${esc(String(r.n))}</td><td class="c">${r.k}個<small>誤送信${r.e}</small></td></tr>`).join('') + '</table>' : '<p class="note">まだ誰もいません</p>';
+ } catch (e) { if (RKS === my) box.innerHTML = '<p class="note err">ランキングを読み込めませんでした</p>'; }
+}
+$('rkBtn').onclick = () => openRank(PF, 'd', 'title');
+$('rkBtn2').onclick = () => openRank(PF, 'd', 'result');
+$('rkBack').onclick = () => { $('rank').hidden = true; if (RKS.from === 'result') $('result').hidden = false; else $('title').hidden = false; };
+$('nm').value = ls.get('b1_name', '');
+$('recBtn').onclick = async () => {
+ const nm = $('nm').value.trim(), note = $('recNote'); note.className = 'note';
+ if (!nm) { note.textContent = '記録するには名前を入れてね'; note.className = 'note err'; return; }
+ if (badName(nm)) { note.textContent = 'その名前は使えません'; note.className = 'note err'; return; }
+ ls.set('b1_name', nm); $('recBtn').disabled = true; note.textContent = '送信中…';
+ try { note.textContent = 'ランキング：' + await submit(nm); note.className = 'note ok'; }
+ catch (e) { note.textContent = e.message === 'norun' ? '通信できなかったので、この回は記録できません' : '送れませんでした。もう一度押してください'; note.className = 'note err'; if (e.message !== 'norun') $('recBtn').disabled = false; }
+};
 
 // ---------- キーボードが出たときに画面を合わせる ----------
 function fit() {
