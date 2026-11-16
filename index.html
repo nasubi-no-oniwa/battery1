@@ -1,9 +1,24 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5RB6XMN0QR"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-5RB6XMN0QR');
+</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no,interactive-widget=resizes-content">
 <title>残り1%</title>
+<meta name="description" content="夜中、スマホのバッテリーは1%。60秒で電源が落ちる前に、お題どおりにLINEを返せ。送る文は自分で打つ。打ちまちがえても取り消せない。">
+<meta property="og:title" content="残り1%">
+<meta property="og:description" content="夜中、スマホのバッテリーは1%。60秒で電源が落ちる前に、お題どおりにLINEを返せ。打ちまちがえても取り消せない。">
+<meta property="og:image" content="https://nasubi-no-oniwa.github.io/battery1/ogp.png">
+<meta property="og:url" content="https://nasubi-no-oniwa.github.io/battery1/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="icon.png">
 <style>
 :root{--bg:#000;--list:#121316;--row:#121316;--line:#24262b;--txt:#f2f3f5;--sub:#8b9098;--green:#06c755;--room:#1c2230;--me:#5bd170;--you:#2e3442;--red:#ff3b30;--yel:#ffd33d}
 [hidden]{display:none!important}
@@ -81,6 +96,7 @@ html,body{margin:0;height:100%;background:#000;color:var(--txt);font-family:-app
 /* タイトル・結果 */
 .panel{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:16px;background:#000c;overflow:auto}
 .card{width:100%;max-width:380px;background:#16181d;border:1px solid #2c2f36;border-radius:22px;padding:22px 18px;text-align:center;max-height:100%;overflow:auto}
+@media (max-width:420px){.panel{padding:10px}.card{padding:20px 12px}}
 .card h1{margin:4px 0 0;font-size:56px;line-height:1;letter-spacing:-.02em;font-weight:900}
 .card h1 em{font-style:normal;color:var(--red)}
 .card .lead{color:#c9ccd2;font-size:14px;line-height:1.7;margin:12px 0 4px}
@@ -121,6 +137,14 @@ table.rk tr.me td{background:#3a3418}
 #off .zero{position:absolute;bottom:22%;left:0;right:0;text-align:center;color:#ff3b30;font-weight:900;font-size:15px;opacity:0;transition:opacity .4s .9s}
 #off.on .zero{opacity:1}
 </style>
+<!-- nasubi-track: 結果画面とXへの投稿の回数を記録（ゲームの動きには影響しない） -->
+<script>(function(){try{var G="battery1",IDS=["result"];
+function ev(n){try{if(typeof gtag==='function')gtag('event',n,{game:G});}catch(e){}}
+var o=window.open;window.open=function(u){try{if(/intent\/(post|tweet)/.test(String(u)))ev('x_share');}catch(e){}return o.apply(window,arguments);};
+if(!IDS.length)return;
+function vis(e){if(!e||!e.isConnected||e.closest('[hidden]'))return false;var r=e.getBoundingClientRect();if(r.width<1||r.height<1)return false;for(var n=e;n&&n.nodeType===1;n=n.parentElement){var s=getComputedStyle(n);if(s.display==='none'||s.visibility==='hidden'||parseFloat(s.opacity)<0.05)return false;}return true;}
+var was={};setInterval(function(){try{var any=false;for(var i=0;i<IDS.length;i++){if(vis(document.getElementById(IDS[i])))any=true;}if(any&&!was.v)ev('result_view');was.v=any;}catch(e){}},700);
+}catch(e){}})();</script>
 </head>
 <body>
 <div id="app">
@@ -171,7 +195,7 @@ table.rk tr.me td{background:#3a3418}
     <div class="res-s" id="rSub"></div>
     <div class="ngl" id="rNg" hidden></div>
     <div id="recBox"><input id="nm" maxlength="12" placeholder="名前（12文字まで）" autocomplete="off"><button class="sub rec" id="recBtn">ランキングに記録する</button><div class="note" id="recNote"></div></div>
-    <a class="sub x" id="xBtn" target="_blank" rel="noopener">𝕏 に投稿</a>
+    <button class="sub x" id="xBtn">𝕏 に投稿</button>
     <button class="big" id="again">もう一度</button>
     <button class="sub" id="rkBtn2">ランキング</button>
     <div class="dev" id="devR"></div>
@@ -456,8 +480,8 @@ function showResult() {
   }
  } else ng.hidden = true;
  const worst = st.ng.length ? '\n' + C[st.ng[0].w].n + 'に「' + st.ng[0].got + '」を誤送信した' : '';
- const text = 'バッテリー1%で、LINEのお題を' + st.n + '個クリア。' + worst + '\n#残り1パーセント #ブラウザゲーム';
- $('xBtn').href = 'https://x.com/intent/post?text=' + encodeURIComponent(text);
+ POST = 'バッテリー1%で、LINEのお題を' + st.n + '個クリア。' + worst + '\n#残り1パーセント #ブラウザゲーム';
+ try { if (typeof gtag === 'function') gtag('event', 'game_end', { game: 'battery1', n: st.n, miss: st.ng.length, pf: IS_MOBILE ? 'm' : 'p' }); } catch (e) { }
  $('result').hidden = false;
 }
 function start() {
@@ -466,8 +490,15 @@ function start() {
  st.live = true; tStart = performance.now(); raf = requestAnimationFrame(loop);
  nextOdai(); noiseT = setTimeout(noise, 2500);
  netStart().catch(() => { RUN = null; });
+ try { if (typeof gtag === 'function') gtag('event', 'game_start', { game: 'battery1' }); } catch (e) { }
  $('recBtn').disabled = false; $('recNote').textContent = '';
 }
+// Xに投稿（自分の紹介ツイートを引用する。引用するツイートは一覧ページ quote/ で切りかえ）
+let POST = '', QUOTE = {};
+const SHARE_URL = 'https://nasubi-no-oniwa.github.io/battery1/';
+fetch('https://ft-red-default-rtdb.asia-southeast1.firebasedatabase.app/xquote/g/battery1.json').then(r => r.json()).then(d => { if (d && typeof d === 'object') QUOTE = d; }).catch(() => { });
+function quoteURL() { const u = QUOTE.ja || ''; return /^https:\/\/x\.com\/[A-Za-z0-9_]{1,15}\/status\/\d{5,25}$/.test(u) ? u : ''; }
+$('xBtn').addEventListener('click', () => { const q = quoteURL(); window.open('https://x.com/intent/post?text=' + encodeURIComponent(q ? POST + '\n' + SHARE_URL : POST) + '&url=' + encodeURIComponent(q || SHARE_URL), '_blank'); });
 $('go').addEventListener('click', start);
 $('again').addEventListener('click', start);
 
