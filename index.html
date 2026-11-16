@@ -560,7 +560,7 @@ function powerOff() {
  const d = cur && left ? 700 : 150;
  $('vg').classList.remove('on'); $('bat').classList.remove('hot');
  // 画面が1本の線になって消える → まっ暗な画面に電池切れのマーク → 結果
- setTimeout(() => { $('app').classList.remove('flick'); $('app').classList.add('dead'); SFX.off(); vib(120); }, d);
+ setTimeout(() => { $('app').classList.remove('flick'); $('app').classList.add('dead'); bgmStop(); SFX.off(); vib(120); }, d);
  setTimeout(() => { $('off').classList.add('on'); }, d + 560);
  setTimeout(showResult, d + 2350);
 }
@@ -591,7 +591,7 @@ function start() {
  $('app').classList.remove('dead', 'flick'); $('vg').classList.remove('on'); $('bat').classList.remove('hot'); hot = 0;
  $('title').hidden = true; $('result').hidden = true; $('rank').hidden = true; toastShown = 0; odai = null;
  st.live = true; tStart = performance.now(); raf = requestAnimationFrame(loop);
- nextOdai(); noiseT = setTimeout(noise, 2500);
+ nextOdai(); noiseT = setTimeout(noise, 2500); bgmStart();
  netStart().catch(() => { RUN = null; });
  try { if (typeof gtag === 'function') gtag('event', 'game_start', { game: 'battery1' }); } catch (e) { }
  $('recBtn').disabled = false; $('recNote').textContent = '';
@@ -694,6 +694,47 @@ const SFX = {
  heart: () => { tone(150, .1, 'sine', .5, 70); tone(125, .12, 'sine', .4, 60, .15); },                                  // 残り10秒の心臓の音
  off: () => { tone(1500, .45, 'sine', .1, 60); tone(110, .3, 'sine', .4, 45, .02); },                                   // 電源が切れる
 };
+// ---------- BGM（自作。夜の静かな曲が、電池が減るほど速く・にぎやかになる。電源が切れた瞬間にぷつっと止まる） ----------
+const BGM = { on: false, tm: null, next: 0, step: 0, g: null, nz: null };
+const BG_CH = [ // Am → F → Dm → E（8分音符のならび）と、低い音
+ { b: 220.00, a: [440.00, 523.25, 659.25, 523.25, 880.00, 659.25, 523.25, 659.25] },
+ { b: 174.61, a: [349.23, 440.00, 523.25, 440.00, 698.46, 523.25, 440.00, 523.25] },
+ { b: 146.83, a: [293.66, 349.23, 440.00, 349.23, 587.33, 440.00, 349.23, 440.00] },
+ { b: 164.81, a: [329.63, 415.30, 493.88, 415.30, 659.25, 493.88, 415.30, 493.88] },
+];
+function bgTone(f, t0, dur, type, vol, f2) { try { const o = AC.createOscillator(), g = AC.createGain(); o.type = type; o.frequency.setValueAtTime(f, t0); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t0 + dur); g.gain.setValueAtTime(.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + .012); g.gain.exponentialRampToValueAtTime(vol * .4, t0 + dur * .5); g.gain.exponentialRampToValueAtTime(.0005, t0 + dur); o.connect(g); g.connect(BGM.g); o.start(t0); o.stop(t0 + dur + .03); } catch (e) { } }
+function bgNoise(t0, dur, vol, type, freq) { try { const s = AC.createBufferSource(), f = AC.createBiquadFilter(), g = AC.createGain(); s.buffer = BGM.nz; f.type = type; f.frequency.value = freq; g.gain.setValueAtTime(vol, t0); g.gain.exponentialRampToValueAtTime(.0005, t0 + dur); s.connect(f); f.connect(g); g.connect(BGM.g); s.start(t0, Math.random() * .5, dur + .02); } catch (e) { } }
+function bgStep(t0, sd, el) { // el：はじまってからの割合（0〜1）
+ const i = BGM.step % 8, ch = BG_CH[(BGM.step >> 3) % 4];
+ bgTone(ch.a[i], t0, sd * 2.6, 'triangle', .075);                                   // きらきらした音（ずっと鳴る）
+ if (i === 0 || i === 3 || i === 6) bgTone(ch.b, t0, sd * 2.8, 'triangle', .13);          // 低い音
+ if (el > .2) { if (i === 0 || i === 4) bgTone(130, t0, .13, 'sine', .3, 48); if (i % 2 === 1) bgNoise(t0, .035, .05, 'highpass', 7000); } // 12秒から：どん・ち
+ if (el > .5) { if (i === 2 || i === 6) bgNoise(t0, .09, .09, 'bandpass', 1900); bgTone(ch.a[i] * 2, t0, sd * .8, 'sine', .028); }         // 30秒から：たん・高い音
+ if (el > .75 && i % 2 === 0) bgNoise(t0 + sd / 2, .025, .035, 'highpass', 8000);                                                          // 45秒から：こまかい「ち」
+}
+function bgTick() {
+ if (!BGM.on || !AC) return;
+ if (MUTE) { BGM.next = 0; return; }
+ if (BGM.next < AC.currentTime) BGM.next = AC.currentTime + .06;
+ while (BGM.next < AC.currentTime + .25) {
+  const el = Math.min(1, Math.max(0, (performance.now() - tStart) / DUR)), bpm = 92 + 58 * Math.pow(el, 1.6), sd = 60 / bpm / 2;
+  bgStep(BGM.next, sd, el); BGM.next += sd; BGM.step++;
+ }
+}
+function bgmStart() {
+ bgmStop(); if (!audio()) return;
+ try {
+  if (!BGM.nz) { const n = AC.sampleRate, b = AC.createBuffer(1, n, n), d = b.getChannelData(0); for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1; BGM.nz = b; }
+  const lp = AC.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 5200;
+  BGM.g = AC.createGain(); BGM.g.gain.setValueAtTime(.0001, AC.currentTime); BGM.g.gain.exponentialRampToValueAtTime(1.5, AC.currentTime + .5);
+  BGM.g.connect(lp); lp.connect(MG);
+  BGM.on = true; BGM.step = 0; BGM.next = 0; BGM.tm = setInterval(bgTick, 50); bgTick();
+ } catch (e) { BGM.on = false; }
+}
+function bgmStop() { // 電源が切れた瞬間：いま鳴っている音ごと切る
+ BGM.on = false; if (BGM.tm) { clearInterval(BGM.tm); BGM.tm = null; }
+ try { if (BGM.g) { const g = BGM.g; BGM.g = null; g.gain.cancelScheduledValues(AC.currentTime); g.gain.setValueAtTime(g.gain.value, AC.currentTime); g.gain.linearRampToValueAtTime(0, AC.currentTime + .03); setTimeout(() => { try { g.disconnect(); } catch (e) { } }, 300); } } catch (e) { }
+}
 function vib(p) { try { if (!MUTE && navigator.vibrate) navigator.vibrate(p); } catch (e) { } }
 function sndLabel() { $('sndBtn').textContent = MUTE ? '🔇 音なし' : '🔊 音あり'; }
 $('sndBtn').onclick = () => { MUTE = !MUTE; ls.set('b1_mute', MUTE ? 1 : 0); sndLabel(); if (!MUTE) { audio(); SFX.inc(); } };
