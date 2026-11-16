@@ -472,9 +472,9 @@ $('go').addEventListener('click', start);
 $('again').addEventListener('click', start);
 
 
-// ---------- ランキング（ft-red の battery1） ----------
+// ---------- ランキング（ft-blue の battery1） ----------
 const ls = { get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v) } catch (e) { return d } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)) } catch (e) { } } };
-const FB = { key: 'AIzaSyBCzVyblBmfNQq4XdPHdQppE94gyiYxDkA', db: 'https://ft-red-default-rtdb.asia-southeast1.firebasedatabase.app' };
+const FB = { key: 'AIzaSyB2iLUuAyxSJ45RewGrbyLg0sYLsC7njIo', db: 'https://ft-blue-default-rtdb.asia-southeast1.firebasedatabase.app' };
 const PF = IS_MOBILE ? 'm' : 'p';
 const NG_WORDS = ['ちんこ','ちんぽ','まんこ','せっくす','セックス','きんたま','レイプ','死ね','しね','殺す','ころす','ガイジ','キチガイ','きちがい','ニガー','チョン','支那','fuck','shit','bitch','cunt','dick','pussy','nigger','nigga','faggot','retard','whore','slut','rape','porn','nazi','hitler'];
 const badName = s => { const n = s.normalize('NFKC').toLowerCase().replace(/[\s・._\-ー〜~!！?？*＊]/g, ''); return NG_WORDS.some(w => n.includes(w.normalize('NFKC').toLowerCase())); };
