@@ -705,16 +705,16 @@ $('recBtn').onclick = async () => {
 
 // ---------- 音（「はじめる」を押したときに用意する。端末がマナーモードなら鳴らない） ----------
 let AC = null, MG = null, MUTE = !!ls.get('b1_mute', 0);
-function audio() { if (MUTE) return null; try { if (!AC) { AC = new (window.AudioContext || window.webkitAudioContext)(); MG = AC.createGain(); MG.gain.value = .55; MG.connect(AC.destination); } if (AC.state === 'suspended') AC.resume().catch(() => { }); return AC; } catch (e) { return null; } }
+function audio() { if (MUTE) return null; try { if (!AC) { const ACx = window.AudioContext || window.webkitAudioContext; try { AC = new ACx({ latencyHint: 'playback' }); } catch (e) { AC = new ACx(); } MG = AC.createGain(); MG.gain.value = .5; const lp = AC.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 7000; lp.Q.value = .5; MG.connect(lp); lp.connect(AC.destination); } if (AC.state === 'suspended') AC.resume().catch(() => { }); return AC; } catch (e) { return null; } }
 function tone(f, dur, type, vol, f2, delay) { if (!AC || MUTE) return; try { const t0 = AC.currentTime + (delay || 0), o = AC.createOscillator(), g = AC.createGain(); o.type = type || 'sine'; o.frequency.setValueAtTime(f, t0); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t0 + dur); g.gain.setValueAtTime(.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + .008); g.gain.exponentialRampToValueAtTime(.0005, t0 + dur); o.connect(g); g.connect(MG); o.start(t0); o.stop(t0 + dur + .03); } catch (e) { } }
 const SFX = {
  inc: () => { tone(880, .08, 'sine', .07); tone(1175, .12, 'sine', .06, null, .07); },                                  // 関係ない人からの通知（小さめ）
  target: () => { tone(988, .1, 'sine', .2); tone(1319, .1, 'sine', .18, null, .09); tone(1568, .18, 'sine', .16, null, .18); }, // お題の相手から届いた
  send: () => { tone(520, .09, 'triangle', .1, 1040); },                                                                 // 送信
  ok: () => { tone(1047, .08, 'triangle', .2, null, .06); tone(1568, .2, 'triangle', .18, null, .14); },                 // クリア
- ng: () => { tone(196, .16, 'sawtooth', .1, 150, .05); tone(156, .25, 'sawtooth', .1, 110, .22); },                     // 誤送信
- warn: () => { tone(740, .12, 'square', .05); tone(740, .12, 'square', .05, null, .2); },                               // 「バッテリー残量が少なくなっています」
- heart: () => { tone(150, .1, 'sine', .5, 70); tone(125, .12, 'sine', .4, 60, .15); },                                  // 残り10秒の心臓の音
+ ng: () => { tone(196, .16, 'triangle', .22, 150, .05); tone(156, .25, 'triangle', .22, 110, .22); },                     // 誤送信
+ warn: () => { tone(740, .12, 'triangle', .1); tone(740, .12, 'triangle', .1, null, .2); },                               // 「バッテリー残量が少なくなっています」
+ heart: () => { tone(150, .1, 'sine', .34, 70); tone(125, .12, 'sine', .27, 60, .15); },                                  // 残り10秒の心臓の音
  off: () => { tone(1500, .45, 'sine', .1, 60); tone(110, .3, 'sine', .4, 45, .02); },                                   // 電源が切れる
 };
 // ---------- BGM（自作。夜の静かな曲が、電池が減るほど速く・にぎやかになる。電源が切れた瞬間にぷつっと止まる） ----------
@@ -726,14 +726,14 @@ const BG_CH = [ // Am → F → Dm → E（8分音符のならび）と、低い
  { b: 164.81, a: [329.63, 415.30, 493.88, 415.30, 659.25, 493.88, 415.30, 493.88] },
 ];
 function bgTone(f, t0, dur, type, vol, f2) { try { const o = AC.createOscillator(), g = AC.createGain(); o.type = type; o.frequency.setValueAtTime(f, t0); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t0 + dur); g.gain.setValueAtTime(.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + .012); g.gain.exponentialRampToValueAtTime(vol * .4, t0 + dur * .5); g.gain.exponentialRampToValueAtTime(.0005, t0 + dur); o.connect(g); g.connect(BGM.g); o.start(t0); o.stop(t0 + dur + .03); } catch (e) { } }
-function bgNoise(t0, dur, vol, type, freq) { try { const s = AC.createBufferSource(), f = AC.createBiquadFilter(), g = AC.createGain(); s.buffer = BGM.nz; f.type = type; f.frequency.value = freq; g.gain.setValueAtTime(vol, t0); g.gain.exponentialRampToValueAtTime(.0005, t0 + dur); s.connect(f); f.connect(g); g.connect(BGM.g); s.start(t0, Math.random() * .5, dur + .02); } catch (e) { } }
+function bgNoise(t0, dur, vol, type, freq) { try { const s = AC.createBufferSource(), f = AC.createBiquadFilter(), g = AC.createGain(); s.buffer = BGM.nz; f.type = type; f.frequency.value = freq; g.gain.setValueAtTime(.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + .004); g.gain.exponentialRampToValueAtTime(.0005, t0 + dur); s.connect(f); f.connect(g); g.connect(BGM.g); s.start(t0, Math.random() * .5, dur + .02); } catch (e) { } }
 function bgStep(t0, sd, el) { // el：はじまってからの割合（0〜1）
  const i = BGM.step % 8, ch = BG_CH[(BGM.step >> 3) % 4];
  bgTone(ch.a[i], t0, sd * 2.6, 'triangle', .075);                                   // きらきらした音（ずっと鳴る）
  if (i === 0 || i === 3 || i === 6) bgTone(ch.b, t0, sd * 2.8, 'triangle', .13);          // 低い音
- if (el > .2) { if (i === 0 || i === 4) bgTone(130, t0, .13, 'sine', .3, 48); if (i % 2 === 1) bgNoise(t0, .035, .05, 'highpass', 7000); } // 12秒から：どん・ち
+ if (el > .2) { if (i === 0 || i === 4) bgTone(130, t0, .13, 'sine', .22, 55); if (i % 2 === 1) bgNoise(t0, .04, .025, 'bandpass', 4200); } // 12秒から：どん・ち
  if (el > .5) { if (i === 2 || i === 6) bgNoise(t0, .09, .09, 'bandpass', 1900); bgTone(ch.a[i] * 2, t0, sd * .8, 'sine', .028); }         // 30秒から：たん・高い音
- if (el > .75 && i % 2 === 0) bgNoise(t0 + sd / 2, .025, .035, 'highpass', 8000);                                                          // 45秒から：こまかい「ち」
+ if (el > .75 && i % 2 === 0) bgNoise(t0 + sd / 2, .03, .015, 'bandpass', 4800);                                                          // 45秒から：こまかい「ち」
 }
 function bgTick() {
  if (!BGM.on || !AC) return;
@@ -749,7 +749,7 @@ function bgmStart() {
  try {
   if (!BGM.nz) { const n = AC.sampleRate, b = AC.createBuffer(1, n, n), d = b.getChannelData(0); for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1; BGM.nz = b; }
   const lp = AC.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 5200;
-  BGM.g = AC.createGain(); BGM.g.gain.setValueAtTime(.0001, AC.currentTime); BGM.g.gain.exponentialRampToValueAtTime(1.5, AC.currentTime + .5);
+  BGM.g = AC.createGain(); BGM.g.gain.setValueAtTime(.0001, AC.currentTime); BGM.g.gain.exponentialRampToValueAtTime(1.2, AC.currentTime + .5);
   BGM.g.connect(lp); lp.connect(MG);
   BGM.on = true; BGM.step = 0; BGM.next = 0; BGM.tm = setInterval(bgTick, 50); bgTick();
  } catch (e) { BGM.on = false; }
