@@ -89,6 +89,9 @@ html,body{margin:0;height:100%;background:#000;color:var(--txt);font-family:-app
 #inp{flex:1;min-width:0;height:38px;border-radius:19px;border:none;background:#2a3140;color:#fff;font-size:16px;padding:0 14px;outline:none;font-family:inherit}
 #send{flex:none;width:38px;height:38px;border-radius:50%;border:none;background:var(--green);color:#fff;font-size:18px;font-weight:900;cursor:pointer}
 #send:disabled{background:#2a3140;color:var(--sub)}
+#tip{position:absolute;left:50%;top:calc(env(safe-area-inset-top,0px) + 96px);transform:translateX(-50%);z-index:35;background:#ff3b30;color:#fff;font-weight:900;font-size:14px;border-radius:12px;padding:7px 14px;white-space:nowrap;box-shadow:0 6px 18px #0008;opacity:0;pointer-events:none}
+#tip.on{animation:tip 1.8s ease-out}
+@keyframes tip{0%{opacity:0;transform:translate(-50%,-6px)}10%,75%{opacity:1;transform:translate(-50%,0)}100%{opacity:0}}
 /* 通知 */
 #toast{position:absolute;left:8px;right:8px;top:calc(env(safe-area-inset-top,0px) + 8px);z-index:30;background:#2b2d33f2;border-radius:16px;padding:11px 14px;font-size:13px;line-height:1.4;box-shadow:0 8px 24px #0008;transform:translateY(-130%);transition:transform .3s}
 #toast.on{transform:none}
@@ -242,9 +245,10 @@ if(document.body)go();else document.addEventListener('DOMContentLoaded',go);
     <div class="pane" id="room">
       <div class="hd"><span id="back">‹</span><span id="rname"></span><span class="ic"><span>⌕</span><span>☏</span><span>≡</span></span></div>
       <div id="msgs"></div>
-      <div id="bar"><span class="pl">＋</span><input id="inp" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="send" placeholder="メッセージを入力"><button id="send" disabled>➤</button></div>
+      <div id="bar"><span class="pl">＋</span><input id="inp" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="メッセージを入力"><button id="send" disabled>➤</button></div>
     </div>
   </div>
+  <div id="tip"></div>
   <div id="toast"><b>バッテリー残量が少なくなっています</b>残り1%です。電源に接続してください。</div>
   <div id="dim"></div>
   <div id="vg"></div>
@@ -411,8 +415,8 @@ const ODAI = S.map((x, i) => ({t:'s', w:x[0], r:x[1], ok:x[2].split('|'), re:yom
 console.log('お題の数', ODAI.length);
 // 待ちのあいだに勝手に届くメッセージ
 const NOISE = {
- boss:['了解','明日よろしく','資料見た？'], mom:['ちゃんと食べてる？','おやすみ','📷'], kano:['ねえ','起きてる？','おーい'],
- tomo:['笑','見てこれ','やばい'], kohai:['先輩〜','すみません'], ooya:['お知らせです'], moto:['ねえ','元気？'],
+ boss:['了解','明日よろしく','資料見た？'], mom:['ちゃんと食べてる？','おやすみ','📷'], kano:['ねえ','💤','おーい'],
+ tomo:['笑','見てこれ','やばい'], kohai:['先輩〜','すみません'], ooya:['お知らせです'], moto:['ねえ','ひさしぶり'],
  chonai:['お知らせです','ご協力お願いします'], papa:['👍','寒いな'], tencho:['シフト表です','よろしく'], ane:['ちょっと','見て'],
  doki:['おつ','明日だるい'], dentist:['ご予約のお知らせ'], groupm:['笑笑','スタンプを送信しました','写真を送信しました'],
 };
@@ -507,6 +511,7 @@ function sendMsg() {
   // お題と関係ない相手に送った → これも誤送信
   const li = ch.msgs.filter(x => x.y).pop();
   m.ng = 1; st.ng.push({w:id, want:null, got:text, r:li ? li.t : ''}); SFX.ng(); vib([40, 30, 40]);
+  tip(odai ? 'あて先ちがい！ お題は「' + CALL[odai.w] + '」あて' : 'あて先ちがい！');
  }
  SFX.send();
  renderRoom(true); renderList();
@@ -516,11 +521,21 @@ function sendMsg() {
 $('send').addEventListener('pointerdown', e => e.preventDefault());
 $('send').addEventListener('click', sendMsg);
 $('inp').addEventListener('input', () => { $('send').disabled = !$('inp').value.trim(); });
-$('inp').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing && e.keyCode !== 229) { e.preventDefault(); sendMsg(); } });
+// 送信は ➤ ボタン。スマホは改行キーでは送らない（iPhone の日本語入力の「確定」で、変換の途中のまま送られてしまうため）
+let composing = false, compEnd = 0;
+$('inp').addEventListener('compositionstart', () => { composing = true; });
+$('inp').addEventListener('compositionend', () => { composing = false; compEnd = performance.now(); });
+$('inp').addEventListener('keydown', e => {
+ if (e.key !== 'Enter') return;
+ e.preventDefault();
+ if (IS_MOBILE || composing || e.isComposing || e.keyCode === 229 || performance.now() - compEnd < 150) return;
+ sendMsg();
+});
 ['paste', 'drop'].forEach(ev => $('inp').addEventListener(ev, e => e.preventDefault()));
 $('msgs').addEventListener('click', () => { if (st && st.live) $('inp').focus({preventScroll:true}); });
 
 // ---------- お題 ----------
+function tip(s) { const t = $('tip'); t.textContent = s; t.classList.remove('on'); void t.offsetWidth; t.classList.add('on'); }
 function nextOdai() {
  if (!deck.length) deck = shuffle(ODAI.slice());
  // 直前と同じ相手が続きすぎないように
