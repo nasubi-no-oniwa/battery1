@@ -89,6 +89,7 @@ html,body{margin:0;height:100%;background:#000;color:var(--txt);font-family:-app
 #inp{flex:1;min-width:0;height:38px;border-radius:19px;border:none;background:#2a3140;color:#fff;font-size:16px;padding:0 14px;outline:none;font-family:inherit}
 #send{flex:none;width:38px;height:38px;border-radius:50%;border:none;background:var(--green);color:#fff;font-size:18px;font-weight:900;cursor:pointer}
 #send:disabled{background:#2a3140;color:var(--sub)}
+#langs{display:flex;gap:6px;justify-content:center;margin-top:12px;flex-wrap:wrap}#langs button{border:1px solid #3a3d44;background:#1f2228;color:#c9ccd2;border-radius:16px;padding:5px 12px;font-size:13px;font-weight:800;font-family:inherit;cursor:pointer}#langs button.on{background:#fff;color:#000;border-color:#fff}
 #tip{position:absolute;left:50%;top:calc(env(safe-area-inset-top,0px) + 96px);transform:translateX(-50%);z-index:35;background:#ff3b30;color:#fff;font-weight:900;font-size:14px;border-radius:12px;padding:7px 14px;white-space:nowrap;box-shadow:0 6px 18px #0008;opacity:0;pointer-events:none}
 #tip.on{animation:tip 1.8s ease-out}
 @keyframes tip{0%{opacity:0;transform:translate(-50%,-6px)}10%,75%{opacity:1;transform:translate(-50%,0)}100%{opacity:0}}
@@ -235,12 +236,12 @@ if(document.body)go();else document.addEventListener('DOMContentLoaded',go);
 <body>
 <div id="app">
   <div id="sb"><span id="clk">1:07</span><span id="bat"><span id="batTxt">1%</span><span class="bi"><i id="batFill"></i></span></span></div>
-  <div id="odai"><div class="q" id="q">　</div><div class="k"><small>クリア</small><span id="cnt">0</span></div></div>
+  <div id="odai"><div class="q" id="q">　</div><div class="k"><small id="clrL">クリア</small><span id="cnt">0</span></div></div>
   <div id="scr">
     <div class="pane" id="list">
-      <div class="hd">トーク<span class="ic"><span>⌕</span><span>✎</span></span></div>
+      <div class="hd"><span id="hdT">トーク</span><span class="ic"><span>⌕</span><span>✎</span></span></div>
       <div id="rows"></div>
-      <div id="tabs"><div><b>🏠</b>ホーム</div><div class="on"><b>💬</b>トーク</div><div><b>▶</b>VOOM</div><div><b>🛍</b>ショッピング</div><div><b>⋯</b>ウォレット</div></div>
+      <div id="tabs"><div><b>🏠</b><span>ホーム</span></div><div class="on"><b>💬</b><span>トーク</span></div><div><b>▶</b><span>VOOM</span></div><div><b>🛍</b><span>ショッピング</span></div><div><b>⋯</b><span>ウォレット</span></div></div>
     </div>
     <div class="pane" id="room">
       <div class="hd"><span id="back">‹</span><span id="rname"></span><span class="ic"><span>⌕</span><span>☏</span><span>≡</span></span></div>
@@ -249,16 +250,16 @@ if(document.body)go();else document.addEventListener('DOMContentLoaded',go);
     </div>
   </div>
   <div id="tip"></div>
-  <div id="toast"><b>バッテリー残量が少なくなっています</b>残り1%です。電源に接続してください。</div>
+  <div id="toast"><b id="toastB">バッテリー残量が少なくなっています</b><span id="toastT">残り1%です。電源に接続してください。</span></div>
   <div id="dim"></div>
   <div id="vg"></div>
 </div>
 <div class="panel" id="rank" hidden>
   <div class="card">
-    <div style="font-weight:900;font-size:20px">ランキング</div>
+    <div style="font-weight:900;font-size:20px" id="rkT">ランキング</div>
     <div class="tabs" id="rkPf"><button data-p="m">スマホ</button><button data-p="p">PC</button></div>
     <div class="tabs" id="rkWhen"><button data-w="d">今日</button><button data-w="all">全期間</button></div>
-    <div class="res-s" style="font-size:12px">クリアしたお題が多い順（同じなら誤送信が少ない人が上）</div>
+    <div class="res-s" style="font-size:12px" id="rkNote">クリアしたお題が多い順（同じなら誤送信が少ない人が上）</div>
     <div id="rankBox"></div>
     <button class="sub" id="rkBack">もどる</button>
   </div>
@@ -268,18 +269,19 @@ if(document.body)go();else document.addEventListener('DOMContentLoaded',go);
 <div class="panel" id="title">
   <div class="card">
     <div class="batbig"><span>1%</span><span class="bi"><i style="width:6%;height:100%;display:block;background:#ff3b30;border-radius:2px"></i></span></div>
-    <h1>残り<em>1%</em></h1>
-    <p class="lead">夜中、スマホのバッテリーは <b>1%</b>。<br>あと<b>60秒</b>で電源が落ちる。<br>上に出るお題どおりに、急いでLINEを返せ。<br>送る文は<b>自分で打つ</b>。打ちまちがえても、もう送信は取り消せない。</p>
+    <h1 id="tH1">残り<em>1%</em></h1>
+    <p class="lead" id="tLead">夜中、スマホのバッテリーは <b>1%</b>。<br>あと<b>60秒</b>で電源が落ちる。<br>上に出るお題どおりに、急いでLINEを返せ。<br>送る文は<b>自分で打つ</b>。打ちまちがえても、もう送信は取り消せない。</p>
     <button class="big" id="go">はじめる</button>
     <button class="sub" id="rkBtn">ランキング</button>
     <div class="dev" id="devT"></div><button class="dev" id="sndBtn"></button>
+    <div id="langs"></div>
   </div>
 </div>
 
 <div class="panel" id="result" hidden>
   <div class="card">
     <div class="res-s" id="rHead">バッテリー1%で</div>
-    <div class="res-n"><span id="rN">0</span><small>個クリア</small></div>
+    <div class="res-n"><span id="rN">0</span><small id="rUnit">個クリア</small></div>
     <div class="res-s" id="rSub"></div>
     <div class="wst" id="rWorst" hidden></div>
     <div class="more" id="rMore" hidden></div>
@@ -297,10 +299,9 @@ if(document.body)go();else document.addEventListener('DOMContentLoaded',go);
 const $ = id => document.getElementById(id);
 const DUR = 60000;
 const IS_MOBILE = matchMedia('(pointer:coarse)').matches || /iPhone|iPad|Android|Mobile/i.test(navigator.userAgent);
-$('devT').textContent = $('devR').textContent = IS_MOBILE ? 'スマホのランキング' : 'PCのランキング';
 
 // ---------- 連絡先 ----------
-const C = {
+let C = {
  boss:{n:'部長',a:'👔',c:'#3b4a6b'}, mom:{n:'母',a:'👩',c:'#6b3b5a'}, kano:{n:'みさき',a:'🌸',c:'#7a3d55',rel:'彼女'},
  tomo:{n:'たける',a:'🍺',c:'#6b5a2a',rel:'友だち'}, kohai:{n:'佐藤（後輩）',a:'🐣',c:'#6b6a2a'}, ooya:{n:'大家さん',a:'🏠',c:'#3e5a3e'},
  moto:{n:'元カノ',a:'🥀',c:'#4a2a3a'}, chonai:{n:'町内会',a:'📢',c:'#2a4a5a',g:1}, papa:{n:'父',a:'👨',c:'#3a3a5a'},
@@ -308,8 +309,8 @@ const C = {
  dentist:{n:'さくら歯科',a:'🦷',c:'#2a5a5a'}, groupm:{n:'高校のグループ',a:'🎒',c:'#4a3a2a',g:1},
 };
 // お題の呼び方（お題の文に出る名前）
-const CALL = {boss:'部長',mom:'母',kano:'彼女',tomo:'友だち（たける）',kohai:'後輩',ooya:'大家さん',moto:'元カノ',chonai:'町内会',papa:'父',tencho:'店長',ane:'姉',doki:'同期',dentist:'歯医者',groupm:'高校のグループ'};
-const GROUP_SENDER = {chonai:['会長','山田','鈴木（副会長）'], groupm:['ゆうき','あやか','こうへい']};
+let CALL = {boss:'部長',mom:'母',kano:'彼女',tomo:'友だち（たける）',kohai:'後輩',ooya:'大家さん',moto:'元カノ',chonai:'町内会',papa:'父',tencho:'店長',ane:'姉',doki:'同期',dentist:'歯医者',groupm:'高校のグループ'};
+let GROUP_SENDER = {chonai:['会長','山田','鈴木（副会長）'], groupm:['ゆうき','あやか','こうへい']};
 
 // ---------- お題100種類 ----------
 // s: 送るお題 [相手, 相手からのメッセージ, 送る文（|で区切って別の書き方も正解）]
@@ -404,23 +405,107 @@ const O = [
 // 正解の判定：お題の言葉と同じ言葉なら、漢字・ひらがな・カタカナのどれで打っても正解（[漢字/読み] の部分はどちらでもよく、まぜ書きもOK）。言い方を変えたもの（方言・くだけた言い方）は誤送信のまま
 const YOMI = ["[有難う/有り難う/ありがとう]ございました", "[出来/でき]てます|[出来/でき]ています", "[起/お]きてます", "[確認/かくにん]します", "[9時/九時/くじ]に[行/い]きます", "すみません|すいません|[済/す]みません", "[行/い]けます", "お[供/とも]します", "[順調/じゅんちょう]です", "[今/いま][出/で]ます", "[要/い]らない", "もうすぐ[帰/かえ]る", "[持/も]ってない", "[生/い]きてる", "[有難う/有り難う/ありがとう]", "[分/判/解/わ]かった", "[閉/締/し]めた", "おやすみ|お[休/やす]み", "[ひとり/一人/1人/独り]だよ", "ごめんね|[御免/ごめん]ね", "[大好/だいす]き", "[起/お]きてるよ", "[水族館/すいぞくかん]", "[ほんと/本当/ほんとう/本当に/ほんとうに]ごめん", "[いとこ/従妹/従姉/従兄/従弟/従兄弟/従姉妹]だよ", "[かわいかった/可愛かった]", "[もちろん/勿論]", "[行/い]ける", "[1/一/いち][%/ぱーせんと]", "[うち/家][来/く]る", "[来週/らいしゅう][返/かえ]す", "[行/い]く", "[10時/十時/じゅうじ]", "さんきゅー|ありがとう|[有難/有り難]う", "お[疲/つか]れ", "[駄目/だめ]", "[探/さが]して", "[いる/居る]", "[行/い]く", "[明日/あした/あす][払/はら]います", "[気/き]を[付/つ]けます", "[午後/ごご]で[お願/おねが]いします", "[寝/ね]てる", "[元気/げんき]", "[無理/むり]", "[捨/す]てた", "[承知/しょうち]しました", "[回/まわ]しました", "[参加/さんか]します", "[元気/げんき]", "[分/判/解/わ]かった", "[帰/かえ]る", "まだ", "[入/はい/い]れます", "すぐ[行/い]きます", "[知/し]りません", "すみません|すいません|[済/す]みません", "[返/かえ]して", "おめでとう|[御目出度/おめでと]う", "[花/はな]|お[花/はな]", "[食/た]べてない", "[知/し]ってる", "いいよ|[良/い]いよ", "まじか|[本気/まじ]か", "[行/い]かない", "[伺/うかが]います", "ありません|ないです|[無/な]いです|[有/あ]りません", "[行/い]く", "まじで|[本気/まじ]で", "[見/み]せて"];
 // ちょうど100種類
-const norm = s => s.normalize('NFKC').toLowerCase().replace(/[\u30a1-\u30f6]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x60)).replace(/[\s。、.,!！?？…・~〜～"'「」『』]/g, '');
+const S2T = {"丢": "丟", "来": "來", "系": "係", "个": "個", "传": "傳", "妈": "媽", "对": "對", "带": "帶", "爱": "愛", "时": "時", "会": "會", "没": "沒", "准": "準", "当": "當", "确": "確", "礼": "禮", "给": "給", "经": "經", "缴": "繳", "记": "記", "认": "認", "谢": "謝", "还": "還", "错": "錯", "锁": "鎖", "关": "關", "顺": "順", "馆": "館", "马": "馬", "点": "點"};
+const norm = s => s.normalize('NFKC').toLowerCase().replace(/[\u30a1-\u30f6]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x60)).replace(/[\u4e00-\u9fff]/g, c => S2T[c] || c).replace(/[\s。、.,!！?？…・~〜～"'「」『』’‘“”，：:;]/g, '');
 function yomiRe(spec) { // "[明日/あした]払います|…" → 正規表現
  const ex = s => norm(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
  const vs = [], cur = []; let d = 0, b = '';
  for (const c of spec) { if (c === '[') d++; if (c === ']') d--; if (c === '|' && !d) { vs.push(b); b = ''; } else b += c; } vs.push(b);
  return new RegExp('^(?:' + vs.map(v => v.replace(/\[([^\]]*)\]|([^\[]+)/g, (m, g, lit) => g != null ? '(?:' + g.split('/').map(ex).join('|') + ')' : ex(lit))).join('|') + ')$');
 }
-const ODAI = S.map((x, i) => ({t:'s', w:x[0], r:x[1], ok:x[2].split('|'), re:yomiRe(YOMI[i])})).concat(O.map(x => ({t:'o', w:x[0], r:x[1]})));
+let ODAI = S.map((x, i) => ({t:'s', w:x[0], r:x[1], ok:x[2].split('|'), re:yomiRe(YOMI[i])})).concat(O.map(x => ({t:'o', w:x[0], r:x[1]})));
 console.log('お題の数', ODAI.length);
 // 待ちのあいだに勝手に届くメッセージ
-const NOISE = {
+let NOISE = {
  boss:['了解','明日よろしく','資料見た？'], mom:['ちゃんと食べてる？','おやすみ','📷'], kano:['ねえ','💤','おーい'],
  tomo:['笑','見てこれ','やばい'], kohai:['先輩〜','すみません'], ooya:['お知らせです'], moto:['ねえ','ひさしぶり'],
  chonai:['お知らせです','ご協力お願いします'], papa:['👍','寒いな'], tencho:['シフト表です','よろしく'], ane:['ちょっと','見て'],
  doki:['おつ','明日だるい'], dentist:['ご予約のお知らせ'], groupm:['笑笑','スタンプを送信しました','写真を送信しました'],
 };
-const NG_REPLY = ['？','え？','どういうこと？','なにそれ','大丈夫？','？？？','誰に送ってる？','怖いんだけど'];
+let NG_REPLY = ['？','え？','どういうこと？','なにそれ','大丈夫？','？？？','誰に送ってる？','怖いんだけど'];
+// ---------- 画面のことば（日本語・英語・繁体中文・韓国語） ----------
+const LANGS = [['ja', '日本語'], ['en', 'English'], ['zh', '繁中'], ['ko', '한국어']];
+const TX = {
+ ja: { h1: '残り<em>1%</em>', lead: '夜中、スマホのバッテリーは <b>1%</b>。<br>あと<b>60秒</b>で電源が落ちる。<br>上に出るお題どおりに、急いでLINEを返せ。<br>送る文は<b>自分で打つ</b>。打ちまちがえても、もう送信は取り消せない。',
+  go: 'はじめる', rank: 'ランキング', devM: 'スマホのランキング', devP: 'PCのランキング', sndOn: '🔊 音あり', sndOff: '🔇 音なし', clear: 'クリア', idle: 'ここにお題が出る',
+  chats: 'トーク', tabs: ['ホーム', 'トーク', 'VOOM', 'ショッピング', 'ウォレット'], ph: 'メッセージを入力', toastB: 'バッテリー残量が少なくなっています', toastT: '残り1%です。電源に接続してください。',
+  today: '今日', yday: '昨日', read: '既読', sending: '送信中…', ngL: '誤送信',
+  qS: (w, t) => `${w}にLINEしろ<br><b>${t}</b>`, qO: w => `<b>${w}</b>のLINEを開け`, tip: w => 'あて先ちがい！ お題は「' + w + '」あて', tip0: 'あて先ちがい！',
+  rHead: 'バッテリー1%で', unit: '個クリア', rSub: (n, l) => '誤送信 ' + n + '件' + (l ? '　／　最後の「' + l + '」は送信中のまま…' : ''),
+  more: n => 'ほかの誤送信 ' + n + '件 ', moreH: 'ほかの誤送信', row: (who, got, want) => `${who}に ${got}${want}`, want: w => '（正しくは「' + w + '」）', nobody: '（だれにも頼まれていない）', chatWith: n => n + ' とのトーク',
+  nm: '名前（12文字まで）', rec: 'ランキングに記録する', img: '画像にする', x: '𝕏 に投稿', again: 'もう一度', back: 'もどる', pfM: 'スマホ', pfP: 'PC', dToday: '今日', dAll: '全期間',
+  rkNote: 'クリアしたお題が多い順（同じなら誤送信が少ない人が上）', loading: '読み込み中…', empty: 'まだ誰もいません', rankErr: 'ランキングを読み込めませんでした', rowS: (k, e) => `${k}個<small>誤送信${e}</small>`,
+  needName: '記録するには名前を入れてね', badName: 'その名前は使えません', sendingRec: '送信中…', recPre: 'ランキング：', norun: '通信できなかったので、この回は記録できません', sendErr: '送れませんでした。もう一度押してください',
+  rankRes: (d, a, better) => '今日 ' + d + '・全期間 ' + a + (better ? '' : '（全期間は前の記録のほうが上）'), place: n => n + '位', out: '100位より下',
+  post: (n, w) => 'バッテリー1%で、LINEのお題を' + n + '個クリア。' + (w ? '\n' + w.n + 'に「' + w.got + '」を誤送信した' : ''),
+  imgT: ['残り', '1%', ''], imgHead: 'バッテリー1%で、LINEのお題を', imgUnit: '個クリア', imgNg: n => '誤送信 ' + n + '件', imgWant: w => '正しくは「' + w + '」', imgNobody: 'だれにも頼まれていないのに、送った', imgNone: 'だれにも返信できなかった…' },
+ en: { h1: '<em>1%</em> Left', lead: "It's the middle of the night. Your phone is at <b>1%</b>.<br>It dies in <b>60 seconds</b>.<br>Answer chats exactly as the prompt says.<br>You <b>type every message</b> yourself. Typos can't be unsent.",
+  go: 'Start', rank: 'Ranking', devM: 'Phone ranking', devP: 'PC ranking', sndOn: '🔊 Sound on', sndOff: '🔇 Sound off', clear: 'Cleared', idle: 'Prompts show up here',
+  chats: 'Chats', tabs: ['Home', 'Chats', 'Feed', 'Shop', 'Wallet'], ph: 'Message', toastB: 'Low Battery', toastT: '1% of battery remaining. Connect to power.',
+  today: 'Today', yday: 'Yesterday', read: 'Read', sending: 'Sending…', ngL: 'Mis-sent',
+  qS: (w, t) => `Text ${w}<br><b>${t}</b>`, qO: w => `Open the chat with <b>${w}</b>`, tip: w => 'Wrong chat! This one is for ' + w, tip0: 'Wrong chat!',
+  rHead: 'With 1% battery', unit: 'cleared', rSub: (n, l) => 'Mis-sent: ' + n + (l ? '  /  "' + l + '" never got sent…' : ''),
+  more: n => n + ' more mis-sent ', moreH: 'Other mis-sent', row: (who, got, want) => `to ${who}: ${got}${want}`, want: w => ' (should be "' + w + '")', nobody: ' (nobody asked for this)', chatWith: n => 'Chat with ' + n,
+  nm: 'Name (up to 12)', rec: 'Save to ranking', img: 'Save image', x: 'Post on 𝕏', again: 'Play again', back: 'Back', pfM: 'Phone', pfP: 'PC', dToday: 'Today', dAll: 'All time',
+  rkNote: 'Most prompts cleared (ties: fewer mis-sent first)', loading: 'Loading…', empty: 'No one yet', rankErr: "Couldn't load the ranking", rowS: (k, e) => `${k}<small>mis-sent ${e}</small>`,
+  needName: 'Enter a name to save', badName: "That name can't be used", sendingRec: 'Sending…', recPre: 'Ranking: ', norun: "Couldn't connect, so this run can't be saved", sendErr: "Couldn't send. Please tap again",
+  rankRes: (d, a, better) => 'Today ' + d + ' / All time ' + a + (better ? '' : ' (your earlier all-time best is higher)'), place: n => '#' + n, out: 'below #100',
+  post: (n, w) => 'My phone was at 1% and I cleared ' + n + (n === 1 ? ' chat prompt.' : ' chat prompts.') + (w ? '\nAccidentally sent "' + w.got + '" to ' + w.n : ''),
+  imgT: ['', '1%', ' Left'], imgHead: 'With 1% battery, I cleared', imgUnit: 'prompts', imgNg: n => 'Mis-sent: ' + n, imgWant: w => 'Should be "' + w + '"', imgNobody: 'Nobody asked, but I sent it', imgNone: "Couldn't reply to anyone…" },
+ zh: { h1: '剩下<em>1%</em>', lead: '半夜，手機電量只剩 <b>1%</b>。<br>再 <b>60秒</b> 就要關機。<br>照著上方的題目，趕快回LINE。<br>訊息要<b>自己打字</b>。打錯了也收不回來。',
+  go: '開始', rank: '排行榜', devM: '手機排行榜', devP: '電腦排行榜', sndOn: '🔊 有聲音', sndOff: '🔇 靜音', clear: '完成', idle: '題目會出現在這裡',
+  chats: '聊天', tabs: ['主頁', '聊天', '貼文串', '購物', '錢包'], ph: '輸入訊息', toastB: '電量不足', toastT: '剩餘電量 1%。請連接電源。',
+  today: '今天', yday: '昨天', read: '已讀', sending: '傳送中…', ngL: '傳錯',
+  qS: (w, t) => `傳LINE給${w}<br><b>${t}</b>`, qO: w => `打開<b>${w}</b>的LINE`, tip: w => '傳錯人了！題目是給「' + w + '」', tip0: '傳錯人了！',
+  rHead: '電量1%之下', unit: '題完成', rSub: (n, l) => '傳錯 ' + n + ' 則' + (l ? '　／　最後的「' + l + '」還在傳送中…' : ''),
+  more: n => '其他傳錯 ' + n + ' 則 ', moreH: '其他傳錯', row: (who, got, want) => `給${who} ${got}${want}`, want: w => '（應該是「' + w + '」）', nobody: '（根本沒人要你傳）', chatWith: n => '與' + n + '的聊天',
+  nm: '名字（12字以內）', rec: '登上排行榜', img: '存成圖片', x: '發到 𝕏', again: '再玩一次', back: '返回', pfM: '手機', pfP: '電腦', dToday: '今天', dAll: '全部',
+  rkNote: '依完成題數排序（同分時傳錯較少者在前）', loading: '讀取中…', empty: '還沒有人', rankErr: '無法讀取排行榜', rowS: (k, e) => `${k}題<small>傳錯${e}</small>`,
+  needName: '請輸入名字', badName: '不能使用這個名字', sendingRec: '傳送中…', recPre: '排行榜：', norun: '連線失敗，這次無法記錄', sendErr: '傳送失敗，請再按一次',
+  rankRes: (d, a, better) => '今天 ' + d + '・全部 ' + a + (better ? '' : '（全部排行仍是之前的紀錄較高）'), place: n => '第' + n + '名', out: '100名以外',
+  post: (n, w) => '手機電量1%，完成了' + n + '個LINE題目。' + (w ? '\n不小心傳了「' + w.got + '」給' + w.n : ''),
+  imgT: ['剩下', '1%', ''], imgHead: '電量1%之下，完成了', imgUnit: '個題目', imgNg: n => '傳錯 ' + n + ' 則', imgWant: w => '應該是「' + w + '」', imgNobody: '根本沒人要我傳，卻傳了', imgNone: '一個人都沒回到…' },
+ ko: { h1: '남은 <em>1%</em>', lead: '한밤중, 폰 배터리는 <b>1%</b>.<br><b>60초</b> 뒤면 꺼진다.<br>위에 나오는 지시대로 빨리 카톡을 보내라.<br>메시지는 <b>직접 입력</b>. 오타가 나도 취소할 수 없다.',
+  go: '시작', rank: '랭킹', devM: '폰 랭킹', devP: 'PC 랭킹', sndOn: '🔊 소리 켬', sndOff: '🔇 소리 끔', clear: '클리어', idle: '여기에 지시가 나와요',
+  chats: '채팅', tabs: ['친구', '채팅', '오픈채팅', '쇼핑', '더보기'], ph: '메시지 입력', toastB: '배터리 부족', toastT: '배터리가 1% 남았습니다. 충전기를 연결하세요.',
+  today: '오늘', yday: '어제', read: '읽음', sending: '전송 중…', ngL: '잘못 보냄',
+  qS: (w, t) => `${w}한테 카톡 보내<br><b>${t}</b>`, qO: w => `<b>${w}</b> 카톡 열어`, tip: w => '잘못 보냄! ' + w + '한테 보내야 해', tip0: '잘못 보냄!',
+  rHead: '배터리 1%로', unit: '개 클리어', rSub: (n, l) => '잘못 보냄 ' + n + '건' + (l ? '  /  마지막 「' + l + '」는 전송 중인 채로…' : ''),
+  more: n => '그 밖의 잘못 보냄 ' + n + '건 ', moreH: '그 밖의 잘못 보냄', row: (who, got, want) => `${who}한테 ${got}${want}`, want: w => ' (정답은 「' + w + '」)', nobody: ' (아무도 안 시킴)', chatWith: n => n + ' 채팅방',
+  nm: '이름 (12자까지)', rec: '랭킹에 기록', img: '이미지로 저장', x: '𝕏에 올리기', again: '다시 하기', back: '돌아가기', pfM: '폰', pfP: 'PC', dToday: '오늘', dAll: '전체',
+  rkNote: '클리어 수 순 (같으면 잘못 보낸 게 적은 사람이 위)', loading: '불러오는 중…', empty: '아직 아무도 없어요', rankErr: '랭킹을 불러오지 못했어요', rowS: (k, e) => `${k}개<small>잘못 ${e}</small>`,
+  needName: '기록하려면 이름을 입력하세요', badName: '그 이름은 쓸 수 없어요', sendingRec: '전송 중…', recPre: '랭킹: ', norun: '연결이 안 돼서 이번 판은 기록할 수 없어요', sendErr: '보내지 못했어요. 다시 눌러 주세요',
+  rankRes: (d, a, better) => '오늘 ' + d + ' · 전체 ' + a + (better ? '' : ' (전체는 이전 기록이 더 높아요)'), place: n => n + '위', out: '100위 밖',
+  post: (n, w) => '배터리 1%로 카톡 지시 ' + n + '개 클리어.' + (w ? '\n' + w.n + '한테 「' + w.got + '」 잘못 보냄' : ''),
+  imgT: ['남은 ', '1%', ''], imgHead: '배터리 1%로 클리어한 지시', imgUnit: '개', imgNg: n => '잘못 보냄 ' + n + '건', imgWant: w => '정답은 「' + w + '」', imgNobody: '아무도 안 시켰는데 보냈다', imgNone: '아무한테도 답장 못 했다…' },
+};
+// 英語・繁体中文・韓国語の会話（日本語は上のまま）
+const LD = {"en": {"n": {"boss": "Boss", "mom": "Mom", "kano": "Emma", "tomo": "Jake", "kohai": "Tyler (intern)", "ooya": "Landlord", "moto": "Ex", "chonai": "Neighborhood Watch", "papa": "Dad", "tencho": "Shift Manager", "ane": "Sis", "doki": "Chris (work)", "dentist": "Bright Smile Dental", "groupm": "High School Crew"}, "call": {"boss": "your boss", "mom": "Mom", "kano": "your girlfriend", "tomo": "Jake", "kohai": "the intern", "ooya": "your landlord", "moto": "your ex", "chonai": "the neighborhood group", "papa": "Dad", "tencho": "your manager", "ane": "your sister", "doki": "Chris", "dentist": "the dentist", "groupm": "the high school group"}, "gs": {"chonai": ["Chair", "Mrs. Lee", "Bob"], "groupm": ["Mike", "Ashley", "Ryan"]}, "S": [["boss", "Great work today", "Thank you"], ["boss", "Is the report ready?", "It's ready|It is ready"], ["boss", "You up?", "I'm awake|I am awake"], ["boss", "Any update on that deal?", "I'll check|I will check"], ["boss", "What time can you come in tomorrow?", "9am|9 am|nine am"], ["boss", "You fell asleep in the meeting", "Sorry"], ["boss", "Can you make the trip next week?", "Yes I can"], ["boss", "Drinks after work?", "Count me in"], ["boss", "How is the project going?", "On track"], ["boss", "Can you take a call?", "Calling now"], ["mom", "Do you want dinner?", "No thanks"], ["mom", "When are you coming home?", "Almost home"], ["mom", "Did you bring your charger?", "I forgot it"], ["mom", "Are you alive?", "Still alive"], ["mom", "I sent you some rice", "Thanks Mom"], ["mom", "Call your grandma", "Okay|OK"], ["mom", "Did you lock the door?", "I locked it"], ["mom", "Go to bed", "Good night|Goodnight"], ["kano", "Who are you with?", "I'm alone|I am alone"], ["kano", "Why aren't you replying", "Sorry babe"], ["kano", "Do you love me?", "I love you"], ["kano", "Are you asleep?", "Still awake"], ["kano", "Where should we go tomorrow?", "The aquarium|Aquarium"], ["kano", "I'm not mad", "I'm so sorry|I am so sorry"], ["kano", "Who was that girl?", "My cousin"], ["kano", "Did you like my outfit?", "You looked cute"], ["kano", "Do you remember what day it is?", "Of course"], ["tomo", "Karaoke now?", "I'm in|I am in"], ["tomo", "How much battery do you have?", "1%|1 percent|one percent"], ["tomo", "Missed the last train", "Crash at mine"], ["tomo", "Pay me back", "Next week"], ["tomo", "Pizza?", "Let's go|Lets go"], ["tomo", "What time is the game tomorrow?", "10am|10 am|ten am"], ["tomo", "Happy birthday!", "Thanks man"], ["kohai", "I overslept", "It's fine|It is fine"], ["kohai", "Can I take tomorrow off?", "No"], ["kohai", "I lost the files", "Find them"], ["kohai", "Do you have a girlfriend?", "Yes"], ["kohai", "Want to come to a party?", "Sure"], ["ooya", "Your rent is late", "Paying tomorrow"], ["ooya", "We got a noise complaint", "I'll keep it down|I will keep it down"], ["ooya", "When can I check the plumbing?", "Afternoon please"], ["moto", "Still up?", "I'm asleep|I am asleep"], ["moto", "How are you?", "Fine"], ["moto", "Can we try again?", "No"], ["moto", "Do you still have my hoodie?", "I threw it out"], ["chonai", "You're on trash duty tomorrow", "Got it"], ["chonai", "Please pass the newsletter on", "Done"], ["chonai", "Who can help at the block party?", "I can help"], ["papa", "You doing ok?", "Doing fine"], ["papa", "Call your mother", "Will do"], ["papa", "Coming home for the holidays?", "Yes"], ["papa", "Did you change your tires?", "Not yet"], ["tencho", "Can you cover tomorrow?", "I can"], ["tencho", "You have a shift today", "On my way"], ["tencho", "The register is short", "Not me"], ["tencho", "You can't just skip shifts", "I'm sorry|I am sorry"], ["ane", "I borrowed your jacket", "Give it back"], ["ane", "I'm getting married", "Congrats|Congratulations"], ["ane", "What should we get Mom for her birthday?", "Flowers"], ["ane", "Did you eat my pudding?", "Not me"], ["doki", "The boss is furious", "I know"], ["doki", "Cover my morning meeting?", "Sure"], ["doki", "I'm quitting", "No way"], ["doki", "Coming to drinks?", "Pass"], ["dentist", "Reminder: your appointment is tomorrow at 10", "See you then"], ["dentist", "Any changes to your booking?", "No changes"], ["groupm", "Who's coming to the reunion?", "Me"], ["groupm", "Our teacher got married", "No way"], ["groupm", "Found our yearbook photos", "Show me"]], "O": [["kano", "hey"], ["kano", "Asleep?"], ["kano", "💢"], ["kano", "Read my text"], ["boss", "Got a minute tomorrow morning?"], ["boss", "Sorry for the late text"], ["boss", "URGENT"], ["mom", "Good night"], ["mom", "Sending photos"], ["mom", "📷"], ["tomo", "lol look at this"], ["tomo", "Anyone awake?"], ["moto", "I dreamed about you"], ["moto", "Long time no see"], ["chonai", "Fire drill notice"], ["chonai", "Did the newsletter reach you?"], ["papa", "👍"], ["papa", "Cold today"], ["tencho", "Here's the schedule"], ["tencho", "Free tomorrow?"], ["kohai", "Hey!"], ["ooya", "Plumbing check notice"], ["ane", "Hey"], ["doki", "We have a problem"], ["dentist", "Checkup reminder"], ["groupm", "Sent a sticker"], ["groupm", "Sent a photo"], ["kohai", "Thanks for today"], ["ane", "Call me"], ["doki", "I'm off tomorrow"]], "noise": {"boss": ["Noted", "See you tomorrow", "Did you see the slides?"], "mom": ["Eat something", "Love you", "📷"], "kano": ["hey", "💤", "hello?"], "tomo": ["lol", "check this", "bruh"], "kohai": ["Hey!", "Sorry"], "ooya": ["Notice"], "moto": ["hey", "long time"], "chonai": ["Notice", "Thanks everyone"], "papa": ["👍", "Cold out"], "tencho": ["Schedule", "Thanks"], "ane": ["hey", "look"], "doki": ["sup", "so tired"], "dentist": ["Appointment notice"], "groupm": ["lmao", "Sent a sticker", "Sent a photo"]}, "ng": ["?", "huh?", "what?", "what does that mean", "are you ok?", "???", "who is this for?", "creepy"], "init0": {"boss": "Thanks for today", "mom": "Be safe", "kano": "night 💤", "tomo": "later", "kohai": "Thank you!", "ooya": "Thank you", "moto": "Goodbye", "chonai": "Thanks for helping", "papa": "OK", "tencho": "Good work", "ane": "lol", "doki": "later", "dentist": "Thanks for visiting", "groupm": "lol"}, "ack": ["👍", "ok", "🙏", "got it", "k"]}, "zh": {"n": {"boss": "經理", "mom": "媽", "kano": "小雯", "tomo": "阿傑", "kohai": "學弟", "ooya": "房東", "moto": "前女友", "chonai": "大樓住戶群組", "papa": "爸", "tencho": "店長", "ane": "姊", "doki": "同事阿哲", "dentist": "微笑牙醫", "groupm": "高中同學群組"}, "call": {"boss": "經理", "mom": "媽", "kano": "女朋友", "tomo": "阿傑", "kohai": "學弟", "ooya": "房東", "moto": "前女友", "chonai": "住戶群組", "papa": "爸", "tencho": "店長", "ane": "姊姊", "doki": "阿哲", "dentist": "牙醫", "groupm": "高中群組"}, "gs": {"chonai": ["主委", "王太太", "陳先生"], "groupm": ["阿宏", "小美", "志明"]}, "S": [["boss", "今天辛苦了", "謝謝經理"], ["boss", "報告好了嗎？", "好了"], ["boss", "還醒著嗎？", "醒著"], ["boss", "那個案子怎樣了？", "我確認一下"], ["boss", "明天幾點能到？", "九點到|9點到"], ["boss", "你開會在睡覺吧", "對不起"], ["boss", "下週出差可以嗎？", "可以"], ["boss", "等等去喝一杯？", "我跟"], ["boss", "進度如何？", "很順利"], ["boss", "方便接電話嗎？", "馬上打"], ["mom", "要吃飯嗎？", "不用"], ["mom", "幾點回家？", "快到了"], ["mom", "有帶充電器嗎？", "沒帶"], ["mom", "還活著嗎？", "還活著"], ["mom", "寄米給你了", "謝謝媽"], ["mom", "打給阿嬤", "好啦"], ["mom", "門鎖了嗎？", "鎖了"], ["mom", "快去睡", "晚安"], ["kano", "跟誰在一起？", "一個人"], ["kano", "為什麼不回我", "對不起嘛"], ["kano", "愛我嗎？", "愛你"], ["kano", "睡了嗎？", "還沒睡"], ["kano", "明天去哪？", "水族館"], ["kano", "我沒生氣", "真的對不起"], ["kano", "那個女生是誰？", "我表妹"], ["kano", "今天的衣服怎樣？", "很可愛"], ["kano", "記得今天是什麼日子嗎？", "當然記得"], ["tomo", "現在去唱歌嗎？", "走啊"], ["tomo", "你手機還有電嗎？", "1%|百分之一"], ["tomo", "沒末班車了", "來我家"], ["tomo", "錢還我", "下禮拜還"], ["tomo", "吃宵夜？", "走"], ["tomo", "明天比賽幾點？", "十點|10點"], ["tomo", "生日快樂！", "謝啦"], ["kohai", "學長我睡過頭了", "沒關係"], ["kohai", "明天可以請假嗎", "不行"], ["kohai", "資料不見了", "快找"], ["kohai", "學長有女朋友嗎", "有"], ["kohai", "要不要來聯誼", "去"], ["ooya", "這個月房租還沒繳", "明天繳"], ["ooya", "有人投訴噪音", "我會注意"], ["ooya", "水管檢查什麼時候方便", "下午可以"], ["moto", "還沒睡嗎？", "睡了"], ["moto", "最近好嗎？", "很好"], ["moto", "可以復合嗎？", "不可能"], ["moto", "我的衣服還在嗎？", "丟了"], ["chonai", "明天輪到你倒垃圾", "收到"], ["chonai", "請把公告傳下去", "傳了"], ["chonai", "中秋烤肉誰能幫忙", "我可以"], ["papa", "過得好嗎", "還不錯"], ["papa", "打給你媽", "知道了"], ["papa", "過年回來嗎", "會回去"], ["papa", "機車保養了嗎", "還沒"], ["tencho", "明天能來上班嗎？", "可以"], ["tencho", "今天有班喔？", "馬上到"], ["tencho", "收銀機少錢了", "不是我"], ["tencho", "突然請假很困擾", "抱歉"], ["ane", "我借了你的外套", "還我"], ["ane", "我要結婚了", "恭喜"], ["ane", "媽生日送什麼？", "送花"], ["ane", "布丁是你吃的吧", "不是我"], ["doki", "經理在生氣", "我知道"], ["doki", "明天早會幫我代", "好啊"], ["doki", "我要離職了", "真的假的"], ["doki", "聚餐去嗎？", "不去"], ["dentist", "提醒您明天十點的預約", "會準時到"], ["dentist", "預約需要更改嗎？", "不用改"], ["groupm", "同學會誰要來", "我"], ["groupm", "老師結婚了", "真的假的"], ["groupm", "找到畢業照了", "給我看"]], "O": [["kano", "欸"], ["kano", "睡了？"], ["kano", "💢"], ["kano", "已讀我"], ["boss", "明早能聊一下嗎？"], ["boss", "抱歉這麼晚"], ["boss", "急"], ["mom", "晚安"], ["mom", "傳照片給你"], ["mom", "📷"], ["tomo", "笑死你看"], ["tomo", "有人醒著嗎"], ["moto", "我夢到你"], ["moto", "好久不見"], ["chonai", "消防演習通知"], ["chonai", "公告收到了嗎"], ["papa", "👍"], ["papa", "今天好冷"], ["tencho", "班表給你"], ["tencho", "明天有空嗎？"], ["kohai", "學長～"], ["ooya", "水管檢查通知"], ["ane", "欸"], ["doki", "出事了"], ["dentist", "定期檢查通知"], ["groupm", "傳送了貼圖"], ["groupm", "傳送了照片"], ["kohai", "今天謝謝學長"], ["ane", "打給我"], ["doki", "明天請假"]], "noise": {"boss": ["了解", "明天見", "簡報看了嗎？"], "mom": ["有吃飯嗎", "愛你", "📷"], "kano": ["欸", "💤", "人咧"], "tomo": ["笑死", "你看", "靠"], "kohai": ["學長～", "抱歉"], "ooya": ["通知"], "moto": ["欸", "好久"], "chonai": ["通知", "謝謝大家"], "papa": ["👍", "好冷"], "tencho": ["班表", "辛苦了"], "ane": ["欸", "你看"], "doki": ["安", "好累"], "dentist": ["預約通知"], "groupm": ["哈哈哈", "傳送了貼圖", "傳送了照片"]}, "ng": ["？", "蛤？", "什麼意思", "你還好嗎", "？？？", "傳錯人了吧", "好可怕", "啊？"], "init0": {"boss": "辛苦了", "mom": "路上小心", "kano": "晚安💤", "tomo": "掰", "kohai": "謝謝學長！", "ooya": "謝謝", "moto": "再見", "chonai": "謝謝配合", "papa": "好", "tencho": "辛苦了", "ane": "哈", "doki": "掰", "dentist": "感謝您的光臨", "groupm": "哈哈"}, "ack": ["👍", "好", "ok", "🙏", "收到"]}, "ko": {"n": {"boss": "김 부장님", "mom": "엄마", "kano": "지은", "tomo": "민수", "kohai": "후배 준호", "ooya": "집주인", "moto": "전여친", "chonai": "아파트 입주민방", "papa": "아빠", "tencho": "알바 사장님", "ane": "누나", "doki": "동기 현우", "dentist": "미소치과", "groupm": "고등학교 단톡방"}, "call": {"boss": "부장님", "mom": "엄마", "kano": "여자친구", "tomo": "민수", "kohai": "후배", "ooya": "집주인", "moto": "전여친", "chonai": "입주민방", "papa": "아빠", "tencho": "사장님", "ane": "누나", "doki": "현우", "dentist": "치과", "groupm": "고등학교 단톡방"}, "gs": {"chonai": ["관리소장", "302호", "1104호"], "groupm": ["동현", "수빈", "지호"]}, "S": [["boss", "오늘 수고했어", "감사합니다"], ["boss", "보고서 다 됐나?", "다 됐습니다"], ["boss", "안 자나?", "안 잡니다"], ["boss", "그 건 어떻게 됐어?", "확인하겠습니다"], ["boss", "내일 몇 시에 와?", "9시에 가겠습니다|아홉 시에 가겠습니다"], ["boss", "회의 때 졸았지?", "죄송합니다"], ["boss", "다음 주 출장 가능해?", "가능합니다"], ["boss", "이따 한잔할까?", "좋습니다"], ["boss", "진행 상황은?", "순조롭습니다"], ["boss", "통화 돼?", "전화드릴게요"], ["mom", "밥 먹을래?", "괜찮아"], ["mom", "언제 와?", "거의 다 왔어"], ["mom", "충전기 챙겼어?", "안 챙겼어"], ["mom", "살아는 있니?", "살아 있어"], ["mom", "쌀 보냈다", "고마워 엄마"], ["mom", "할머니께 전화드려", "알겠어"], ["mom", "문 잠갔어?", "잠갔어"], ["mom", "빨리 자", "잘 자"], ["kano", "누구랑 있어?", "혼자야"], ["kano", "왜 답장 안 해", "미안해"], ["kano", "나 사랑해?", "사랑해"], ["kano", "아직 안 자?", "안 자"], ["kano", "내일 어디 갈까?", "아쿠아리움"], ["kano", "나 화 안 났어", "진짜 미안해"], ["kano", "그 여자 누구야?", "사촌 동생이야"], ["kano", "오늘 옷 어땠어?", "귀여웠어"], ["kano", "오늘 무슨 날인지 알아?", "당연하지"], ["tomo", "지금 노래방 갈래?", "콜"], ["tomo", "폰 배터리 몇이야?", "1%|1퍼센트|일 퍼센트"], ["tomo", "막차 끊겼어", "우리 집 와"], ["tomo", "돈 갚아", "다음 주에 줄게"], ["tomo", "치킨 먹을래?", "가자"], ["tomo", "내일 경기 몇 시야?", "10시|열 시"], ["tomo", "생일 축하해!", "고마워"], ["kohai", "선배님 늦잠 잤어요", "괜찮아"], ["kohai", "내일 쉬어도 돼요?", "안 돼"], ["kohai", "자료 잃어버렸어요", "찾아봐"], ["kohai", "선배님 여친 있어요?", "있어"], ["kohai", "소개팅 나갈래요?", "갈게"], ["ooya", "이번 달 월세 아직이에요", "내일 드릴게요"], ["ooya", "소음 민원 들어왔어요", "조심하겠습니다"], ["ooya", "배관 점검 언제가 좋아요?", "오후에 부탁드려요"], ["moto", "안 자?", "잘 거야"], ["moto", "잘 지내?", "잘 지내"], ["moto", "다시 만날 수 없을까?", "안 돼"], ["moto", "내 옷 아직 있어?", "버렸어"], ["chonai", "내일 분리수거 당번입니다", "알겠습니다"], ["chonai", "공지 돌려주세요", "돌렸습니다"], ["chonai", "바자회 도와주실 분", "참여할게요"], ["papa", "잘 지내냐", "잘 지내요"], ["papa", "엄마한테 전화해라", "알겠어요"], ["papa", "설에 오냐", "갈게요"], ["papa", "타이어 갈았냐", "아직요"], ["tencho", "내일 근무 가능?", "가능해요"], ["tencho", "오늘 근무인데?", "바로 갈게요"], ["tencho", "포스기 돈이 안 맞아", "저 아니에요"], ["tencho", "갑자기 빠지면 곤란해", "죄송해요"], ["ane", "네 옷 빌려 입었다", "돌려줘"], ["ane", "나 결혼해", "축하해"], ["ane", "엄마 생신 선물 뭐 사?", "꽃"], ["ane", "푸딩 네가 먹었지", "안 먹었어"], ["doki", "부장님 화났어", "알아"], ["doki", "내일 조회 대신 해줘", "그래"], ["doki", "나 퇴사한다", "헐"], ["doki", "회식 갈 거야?", "안 가"], ["dentist", "내일 10시 예약 안내드립니다", "갈게요"], ["dentist", "예약 변경 있으신가요?", "없어요"], ["groupm", "동창회 올 사람", "나"], ["groupm", "선생님 결혼하셨대", "대박"], ["groupm", "졸업사진 찾았다", "보여줘"]], "O": [["kano", "야"], ["kano", "자?"], ["kano", "💢"], ["kano", "읽어"], ["boss", "내일 아침에 잠깐 얘기 가능?"], ["boss", "늦게 미안"], ["boss", "급함"], ["mom", "잘 자라"], ["mom", "사진 보낼게"], ["mom", "📷"], ["tomo", "ㅋㅋ 이거 봐"], ["tomo", "깨어 있는 사람?"], ["moto", "꿈에 나왔어"], ["moto", "오랜만이야"], ["chonai", "소방 훈련 안내"], ["chonai", "공지 받으셨나요"], ["papa", "👍"], ["papa", "오늘 춥다"], ["tencho", "근무표 보낼게"], ["tencho", "내일 시간 돼?"], ["kohai", "선배님~"], ["ooya", "배관 점검 안내"], ["ane", "야"], ["doki", "큰일 났다"], ["dentist", "정기 검진 안내"], ["groupm", "이모티콘을 보냈습니다"], ["groupm", "사진을 보냈습니다"], ["kohai", "오늘 감사했습니다"], ["ane", "전화해"], ["doki", "내일 연차"]], "noise": {"boss": ["알겠네", "내일 보세", "자료 봤나?"], "mom": ["밥은 먹었니", "사랑해", "📷"], "kano": ["야", "💤", "여보세요?"], "tomo": ["ㅋㅋㅋ", "이거 봐", "헐"], "kohai": ["선배님~", "죄송해요"], "ooya": ["안내"], "moto": ["야", "오랜만"], "chonai": ["안내", "감사합니다"], "papa": ["👍", "춥다"], "tencho": ["근무표", "수고"], "ane": ["야", "봐봐"], "doki": ["ㅎㅇ", "피곤하다"], "dentist": ["예약 안내"], "groupm": ["ㅋㅋㅋㅋ", "이모티콘을 보냈습니다", "사진을 보냈습니다"]}, "ng": ["?", "응?", "무슨 소리야", "뭐야", "괜찮아?", "???", "누구한테 보낸 거야?", "무섭다"], "init0": {"boss": "수고했네", "mom": "조심히 다녀", "kano": "잘 자💤", "tomo": "ㅂㅂ", "kohai": "감사합니다!", "ooya": "감사합니다", "moto": "잘 있어", "chonai": "협조 감사합니다", "papa": "그래", "tencho": "수고", "ane": "ㅋㅋ", "doki": "ㅂㅇ", "dentist": "내원해 주셔서 감사합니다", "groupm": "ㅋㅋ"}, "ack": ["👍", "ㅇㅋ", "ok", "🙏", "넵"]}};
+const JA = { n: Object.fromEntries(Object.keys(C).map(k => [k, C[k].n])), call: CALL, gs: GROUP_SENDER, odai: ODAI, noise: NOISE, ng: NG_REPLY, ack: ['👍','了解','ok','🙏','はーい'] };
+let L = 'ja', T = TX.ja, ACK = JA.ack;
+function pickLang() { const s = ls0('b1_lang'); if (TX[s]) return s; const n = (navigator.language || 'ja').toLowerCase(); return n.startsWith('ja') ? 'ja' : n.startsWith('zh') ? 'zh' : n.startsWith('ko') ? 'ko' : 'en'; }
+function ls0(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }
+function setLang(l) {
+ L = TX[l] ? l : 'ja'; T = TX[L]; try { localStorage.setItem('b1_lang', JSON.stringify(L)); } catch (e) { }
+ document.documentElement.lang = L === 'zh' ? 'zh-Hant' : L;
+ const D = L === 'ja' ? null : LD[L];
+ for (const k of Object.keys(C)) C[k].n = D ? D.n[k] : JA.n[k];
+ CALL = D ? D.call : JA.call; GROUP_SENDER = D ? D.gs : JA.gs; NOISE = D ? D.noise : JA.noise; NG_REPLY = D ? D.ng : JA.ng; ACK = D ? D.ack : JA.ack;
+ ODAI = D ? D.S.map(x => ({t:'s', w:x[0], r:x[1], ok:x[2].split('|'), re:yomiRe(x[2])})).concat(D.O.map(x => ({t:'o', w:x[0], r:x[1]}))) : JA.odai;
+ applyUI();
+}
+function applyUI() {
+ $('tH1').innerHTML = T.h1; $('tLead').innerHTML = T.lead; $('go').textContent = T.go; $('rkBtn').textContent = $('rkBtn2').textContent = $('rkT').textContent = T.rank;
+ $('devT').textContent = $('devR').textContent = IS_MOBILE ? T.devM : T.devP; $('clrL').textContent = T.clear; $('hdT').textContent = T.chats;
+ $('tabs').querySelectorAll('span').forEach((s, i) => { s.textContent = T.tabs[i]; }); $('inp').placeholder = T.ph; $('toastB').textContent = T.toastB; $('toastT').textContent = T.toastT;
+ $('rkNote').textContent = T.rkNote; $('rkBack').textContent = T.back; $('rHead').textContent = T.rHead; $('rUnit').textContent = T.unit; $('nm').placeholder = T.nm;
+ $('recBtn').textContent = T.rec; $('imgBtn').textContent = T.img; $('xBtn').textContent = T.x; $('again').textContent = T.again;
+ $('rkPf').querySelector('[data-p=m]').textContent = T.pfM; $('rkPf').querySelector('[data-p=p]').textContent = T.pfP; $('rkWhen').querySelector('[data-w=d]').textContent = T.dToday; $('rkWhen').querySelector('[data-w=all]').textContent = T.dAll;
+ if (typeof sndLabel === 'function') sndLabel();
+ if (!st || !st.live) $('q').innerHTML = esc(T.idle);
+ $('langs').innerHTML = LANGS.map(([k, v]) => '<button data-l="' + k + '"' + (k === L ? ' class="on"' : '') + '>' + v + '</button>').join('');
+ $('langs').querySelectorAll('button').forEach(b => b.onclick = () => { setLang(b.dataset.l); init(); renderList(); });
+}
 
 // ---------- 状態 ----------
 let st, chats, order, cur, odai, tStart, raf, noiseT, deck;
@@ -431,12 +516,12 @@ tick(); setInterval(tick, 10000);
 function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; }
 function init() {
  chats = {}; order = [];
- const init0 = {
+ const init0 = L !== 'ja' ? LD[L].init0 : {
   boss:'お疲れさまです', mom:'気をつけてね', kano:'おやすみ💤', tomo:'またな', kohai:'ありがとうございます！', ooya:'よろしくお願いします',
   moto:'さようなら', chonai:'ご協力ありがとうございました', papa:'了解', tencho:'お疲れ', ane:'笑', doki:'おつ', dentist:'ご来院ありがとうございました', groupm:'笑笑',
  };
  const ids = shuffle(Object.keys(C));
- ids.forEach((id, i) => { chats[id] = {msgs:[{y:1, t:init0[id], s:C[id].g ? GROUP_SENDER[id][0] : ''}], unread:0, time:'昨日'}; order.push(id); });
+ ids.forEach((id, i) => { chats[id] = {msgs:[{y:1, t:init0[id], s:C[id].g ? GROUP_SENDER[id][0] : ''}], unread:0, time:T.yday}; order.push(id); });
  st = {n:0, miss:0, ng:[], live:false, ended:false};
  cur = null; deck = shuffle(ODAI.slice());
 }
@@ -477,12 +562,12 @@ function openRoom(id) {
 function closeRoom() { cur = null; $('room').classList.remove('on'); $('inp').blur(); renderList(); }
 $('back').addEventListener('click', closeRoom);
 function renderRoom(scroll) {
- const box = $('msgs'), ch = chats[cur]; box.innerHTML = '<div class="day">今日</div>';
+ const box = $('msgs'), ch = chats[cur]; box.innerHTML = '<div class="day">' + T.today + '</div>';
  for (const m of ch.msgs) {
   const el = document.createElement('div');
   if (m.me) {
    el.className = 'm me' + (m.ng ? ' ng' : '') + (m.sending ? ' sending' : '');
-   el.innerHTML = `<div class="st">${m.sending ? '送信中…' : (m.ng ? '<b>誤送信</b>' : '') + (m.read ? '既読<br>' : '') + (m.tm || '')}</div><div class="bb"></div>`;
+   el.innerHTML = `<div class="st">${m.sending ? T.sending : (m.ng ? '<b>' + T.ngL + '</b>' : '') + (m.read ? T.read + '<br>' : '') + (m.tm || '')}</div><div class="bb"></div>`;
   } else {
    el.className = 'm y';
    el.innerHTML = `<div class="av" style="background:${C[cur].c}">${C[cur].a}</div><div class="wrap">${m.s ? '<span class="sn"></span>' : ''}<div class="bb"></div></div>`;
@@ -511,7 +596,7 @@ function sendMsg() {
   // お題と関係ない相手に送った → これも誤送信
   const li = ch.msgs.filter(x => x.y).pop();
   m.ng = 1; st.ng.push({w:id, want:null, got:text, r:li ? li.t : ''}); SFX.ng(); vib([40, 30, 40]);
-  tip(odai ? 'あて先ちがい！ お題は「' + CALL[odai.w] + '」あて' : 'あて先ちがい！');
+  tip(odai ? T.tip(CALL[odai.w]) : T.tip0);
  }
  SFX.send();
  renderRoom(true); renderList();
@@ -542,14 +627,14 @@ function nextOdai() {
  let i = deck.findIndex(o => !odai || o.w !== odai.w); if (i < 0) i = 0;
  odai = deck.splice(i, 1)[0];
  const who = CALL[odai.w];
- if (odai.t === 's') $('q').innerHTML = `${esc(who)}にLINEしろ<br><b>${esc(odai.ok[0])}</b>`;
- else $('q').innerHTML = `<b>${esc(who)}</b>のLINEを開け`;
+ if (odai.t === 's') $('q').innerHTML = T.qS(esc(who), esc(odai.ok[0]));
+ else $('q').innerHTML = T.qO(esc(who));
  { const q = $('q'); q.classList.remove('in'); void q.offsetWidth; q.classList.add('in'); }
  // 相手からメッセージが届く
  { const o = odai; setTimeout(() => { if (st.live) incoming(o.w, o.r); }, 120); }
 }
 const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function clear() { st.n++; $('cnt').textContent = st.n; flash('ok'); plusOne(); SFX.ok(); const id = odai.w; odai = null; setTimeout(() => { if (st.live) nextOdai(); }, 280); if (Math.random() < .35) setTimeout(() => { if (st.live && id !== (odai && odai.w)) incoming(id, ['👍','了解','ok','🙏','はーい'][Math.random() * 5 | 0]); }, 900); }
+function clear() { st.n++; $('cnt').textContent = st.n; flash('ok'); plusOne(); SFX.ok(); const id = odai.w; odai = null; setTimeout(() => { if (st.live) nextOdai(); }, 280); if (Math.random() < .35) setTimeout(() => { if (st.live && id !== (odai && odai.w)) incoming(id, ACK[Math.random() * ACK.length | 0]); }, 900); }
 function fail() { st.miss++; flash('ng'); SFX.ng(); vib([40, 30, 40]); odai = null; setTimeout(() => { if (st.live) nextOdai(); }, 900); }
 function flash(k) { const o = $('odai'); o.classList.remove('ok', 'ng'); void o.offsetWidth; o.classList.add(k); }
 
@@ -589,23 +674,22 @@ function powerOff() {
 }
 function showResult() {
  $('rN').textContent = 0;
- $('rSub').textContent = '誤送信 ' + st.ng.length + '件' + (st.last ? '　／　最後の「' + st.last + '」は送信中のまま…' : '');
+ $('rSub').textContent = T.rSub(st.ng.length, st.last);
  const ng = $('rNg');
  if (st.ng.length) {
   worstBox(st.ng[0]);
   // ほかの誤送信は、押したら開く（結果の画面が長くなって「もう一度」が下に隠れないように）
-  { const more = st.ng.length - 1, tg = $('rMore'); ng.hidden = true; tg.hidden = more < 1; const lab = () => { tg.textContent = 'ほかの誤送信 ' + more + '件 ' + (ng.hidden ? '▾' : '▴'); }; lab(); tg.onclick = () => { ng.hidden = !ng.hidden; lab(); }; }
-  ng.innerHTML = '<div style="color:#8b9098;font-size:12px">ほかの誤送信</div>';
+  { const more = st.ng.length - 1, tg = $('rMore'); ng.hidden = true; tg.hidden = more < 1; const lab = () => { tg.textContent = T.more(more) + (ng.hidden ? '▾' : '▴'); }; lab(); tg.onclick = () => { ng.hidden = !ng.hidden; lab(); }; }
+  ng.innerHTML = '<div style="color:#8b9098;font-size:12px">' + esc(T.moreH) + '</div>';
   for (const x of st.ng.slice(1).slice(-11)) {
    const d = document.createElement('div');
-   d.innerHTML = `<span></span>に <u></u>${x.want ? ' <s>（正しくは「' + esc(x.want) + '」）</s>' : ' <s>（だれにも頼まれていない）</s>'}`;
+   d.innerHTML = T.row('<span></span>', '<u></u>', ' <s>' + esc(x.want ? T.want(x.want) : T.nobody) + '</s>');
    d.querySelector('span').textContent = C[x.w].n; d.querySelector('u').textContent = '「' + x.got + '」';
    ng.appendChild(d);
   }
  } else { ng.hidden = true; $('rWorst').hidden = true; $('rMore').hidden = true; }
- const worst = st.ng.length ? '\n' + C[st.ng[0].w].n + 'に「' + st.ng[0].got + '」を誤送信した' : '';
- POST = 'バッテリー1%で、LINEのお題を' + st.n + '個クリア。' + worst + '\n#残り1パーセント #ブラウザゲーム';
- try { if (typeof gtag === 'function') gtag('event', 'game_end', { game: 'battery1', n: st.n, miss: st.ng.length, pf: IS_MOBILE ? 'm' : 'p' }); } catch (e) { }
+ POST = T.post(st.n, st.ng.length ? { n: C[st.ng[0].w].n, got: st.ng[0].got } : null) + '\n#残り1パーセント #ブラウザゲーム';
+ try { if (typeof gtag === 'function') gtag('event', 'game_end', { game: 'battery1', lang: L, n: st.n, miss: st.ng.length, pf: IS_MOBILE ? 'm' : 'p' }); } catch (e) { }
  $('result').hidden = false;
  countUp($('rN'), st.n);
 }
@@ -623,7 +707,7 @@ function start() {
 let POST = '', QUOTE = {};
 const SHARE_URL = 'https://nasubi-no-oniwa.github.io/battery1/';
 fetch('https://ft-red-default-rtdb.asia-southeast1.firebasedatabase.app/xquote/g/battery1.json').then(r => r.json()).then(d => { if (d && typeof d === 'object') QUOTE = d; }).catch(() => { });
-function quoteURL() { const u = QUOTE.ja || ''; return /^https:\/\/x\.com\/[A-Za-z0-9_]{1,15}\/status\/\d{5,25}$/.test(u) ? u : ''; }
+function quoteURL() { const u = (L === 'ja' ? QUOTE.ja : QUOTE.en) || ''; return /^https:\/\/x\.com\/[A-Za-z0-9_]{1,15}\/status\/\d{5,25}$/.test(u) ? u : ''; }
 $('xBtn').addEventListener('click', () => { const q = quoteURL(); window.open('https://x.com/intent/post?text=' + encodeURIComponent(q ? POST + '\n' + SHARE_URL : POST) + '&url=' + encodeURIComponent(q || SHARE_URL), '_blank'); });
 $('go').addEventListener('click', start);
 $('again').addEventListener('click', start);
@@ -664,8 +748,8 @@ async function submit(nm) {
  if (okD) { const r = await PUT(DB('b/' + PF + '/d/' + a.uid) + QA(a), recD); if (!r.ok) throw new Error('d'); }
  if (okA) { const r = await PUT(DB('b/' + PF + '/all/' + a.uid) + QA(a), rec); if (!r.ok) throw new Error('all'); }
  const [rd, ra] = await Promise.all([board(PF, 'd'), board(PF, 'all')]);
- const f = rows => { const x = rows.find(r => r.id === a.uid); return x ? x.rk + '位' : '100位より下'; };
- return '今日 ' + f(rd) + '・全期間 ' + f(ra) + (okA ? '' : '（全期間は前の記録のほうが上）');
+ const f = rows => { const x = rows.find(r => r.id === a.uid); return x ? T.place(x.rk) : T.out; };
+ return T.rankRes(f(rd), f(ra), okA);
 }
 async function board(pf, when) {
  const dk = dayKey(Date.now());
@@ -683,12 +767,12 @@ async function openRank(pf, when, from) {
  $('title').hidden = true; $('result').hidden = true; $('rank').hidden = false;
  $('rkPf').querySelectorAll('button').forEach(b => { b.className = b.dataset.p === pf ? 'on' : ''; b.onclick = () => openRank(b.dataset.p, RKS.when); });
  $('rkWhen').querySelectorAll('button').forEach(b => { b.className = b.dataset.w === when ? 'on' : ''; b.onclick = () => openRank(RKS.pf, b.dataset.w); });
- const box = $('rankBox'); box.innerHTML = '<p class="note">読み込み中…</p>';
+ const box = $('rankBox'); box.innerHTML = '<p class="note">' + T.loading + '</p>';
  try {
   const rows = await board(pf, when); if (RKS !== my) return;
   const me = (ls.get('b1_auth', null) || {}).uid;
-  box.innerHTML = rows.length ? '<table class="rk">' + rows.map(r => `<tr${r.id === me ? ' class="me"' : ''}><td class="r">${r.rk}</td><td class="n">${esc(String(r.n))}</td><td class="c">${r.k}個<small>誤送信${r.e}</small></td></tr>`).join('') + '</table>' : '<p class="note">まだ誰もいません</p>';
- } catch (e) { if (RKS === my) box.innerHTML = '<p class="note err">ランキングを読み込めませんでした</p>'; }
+  box.innerHTML = rows.length ? '<table class="rk">' + rows.map(r => `<tr${r.id === me ? ' class="me"' : ''}><td class="r">${r.rk}</td><td class="n">${esc(String(r.n))}</td><td class="c">${T.rowS(r.k, r.e)}</td></tr>`).join('') + '</table>' : '<p class="note">' + T.empty + '</p>';
+ } catch (e) { if (RKS === my) box.innerHTML = '<p class="note err">' + T.rankErr + '</p>'; }
 }
 $('rkBtn').onclick = () => openRank(PF, 'd', 'title');
 $('rkBtn2').onclick = () => openRank(PF, 'd', 'result');
@@ -696,11 +780,11 @@ $('rkBack').onclick = () => { $('rank').hidden = true; if (RKS.from === 'result'
 $('nm').value = ls.get('b1_name', '');
 $('recBtn').onclick = async () => {
  const nm = $('nm').value.trim(), note = $('recNote'); note.className = 'note';
- if (!nm) { note.textContent = '記録するには名前を入れてね'; note.className = 'note err'; return; }
- if (badName(nm)) { note.textContent = 'その名前は使えません'; note.className = 'note err'; return; }
- ls.set('b1_name', nm); $('recBtn').disabled = true; note.textContent = '送信中…';
- try { note.textContent = 'ランキング：' + await submit(nm); note.className = 'note ok'; }
- catch (e) { note.textContent = e.message === 'norun' ? '通信できなかったので、この回は記録できません' : '送れませんでした。もう一度押してください'; note.className = 'note err'; if (e.message !== 'norun') $('recBtn').disabled = false; }
+ if (!nm) { note.textContent = T.needName; note.className = 'note err'; return; }
+ if (badName(nm)) { note.textContent = T.badName; note.className = 'note err'; return; }
+ ls.set('b1_name', nm); $('recBtn').disabled = true; note.textContent = T.sendingRec;
+ try { note.textContent = T.recPre + await submit(nm); note.className = 'note ok'; }
+ catch (e) { note.textContent = e.message === 'norun' ? T.norun : T.sendErr; note.className = 'note err'; if (e.message !== 'norun') $('recBtn').disabled = false; }
 };
 
 // ---------- 音（「はじめる」を押したときに用意する。端末がマナーモードなら鳴らない） ----------
@@ -759,7 +843,7 @@ function bgmStop() { // 電源が切れた瞬間：いま鳴っている音ご�
  try { if (BGM.g) { const g = BGM.g; BGM.g = null; g.gain.cancelScheduledValues(AC.currentTime); g.gain.setValueAtTime(g.gain.value, AC.currentTime); g.gain.linearRampToValueAtTime(0, AC.currentTime + .03); setTimeout(() => { try { g.disconnect(); } catch (e) { } }, 300); } } catch (e) { }
 }
 function vib(p) { try { if (!MUTE && navigator.vibrate) navigator.vibrate(p); } catch (e) { } }
-function sndLabel() { $('sndBtn').textContent = MUTE ? '🔇 音なし' : '🔊 音あり'; }
+function sndLabel() { $('sndBtn').textContent = MUTE ? T.sndOff : T.sndOn; }
 $('sndBtn').onclick = () => { MUTE = !MUTE; ls.set('b1_mute', MUTE ? 1 : 0); sndLabel(); if (!MUTE) { audio(); SFX.inc(); } };
 sndLabel();
 // ---------- 小さな動き ----------
@@ -767,8 +851,8 @@ function plusOne() { const c = $('cnt'); c.classList.remove('bump'); void c.offs
 function countUp(el, n) { const t0 = performance.now(), dur = Math.min(900, 250 + n * 60); el.classList.remove('bump'); (function f() { const k = Math.min(1, (performance.now() - t0) / dur); el.textContent = Math.round(n * (1 - Math.pow(1 - k, 3))); if (k < 1 && !$('result').hidden) requestAnimationFrame(f); else { el.textContent = n; void el.offsetWidth; el.classList.add('bump'); if (n > 0 && !$('result').hidden) SFX.ok(); } })(); }
 // いちばんの誤送信を、トークの形で見せる
 function worstBox(x) { const b = $('rWorst'), c = C[x.w]; b.hidden = false;
- b.innerHTML = '<div class="wl"></div>' + (x.r ? '<div class="m y"><div class="av"></div><div class="wrap"><div class="bb"></div></div></div>' : '') + '<div class="m me ng"><div class="st"><b>誤送信</b>既読</div><div class="bb"></div></div>';
- b.querySelector('.wl').textContent = c.n + ' とのトーク' + (x.want ? '（正しくは「' + x.want + '」）' : '（だれにも頼まれていない）');
+ b.innerHTML = '<div class="wl"></div>' + (x.r ? '<div class="m y"><div class="av"></div><div class="wrap"><div class="bb"></div></div></div>' : '') + '<div class="m me ng"><div class="st"><b>' + T.ngL + '</b>' + T.read + '</div><div class="bb"></div></div>';
+ b.querySelector('.wl').textContent = T.chatWith(c.n) + (x.want ? T.want(x.want) : T.nobody);
  if (x.r) { const av = b.querySelector('.av'); av.textContent = c.a; av.style.background = c.c; b.querySelector('.m.y .bb').textContent = x.r; }
  b.querySelector('.m.me .bb').textContent = x.got; }
 // ---------- 結果を画像にする（共有できる端末は共有、できなければ保存） ----------
@@ -779,7 +863,7 @@ async function makeImage() {
  const cut = (s, n) => { const a = Array.from(String(s)); return a.length > n ? a.slice(0, n).join('') + '…' : a.join(''); };
  g.fillStyle = '#0b0d12'; g.fillRect(0, 0, W, H); g.textBaseline = 'middle';
  // 上：題名と電池
- g.textAlign = 'left'; g.font = F(92); g.fillStyle = '#f2f3f5'; const t1 = '残り', w1 = g.measureText(t1).width; g.fillText(t1, 70, 120); g.fillStyle = '#ff3b30'; g.fillText('1%', 70 + w1, 120);
+ g.textAlign = 'left'; g.font = F(92); g.fillStyle = '#f2f3f5'; const t1 = T.imgT[0], w1 = g.measureText(t1).width; g.fillText(t1, 70, 120); g.fillStyle = '#ff3b30'; g.fillText('1%', 70 + w1, 120); const w2 = g.measureText('1%').width; g.fillStyle = '#f2f3f5'; g.fillText(T.imgT[2], 70 + w1 + w2, 120);
  g.strokeStyle = '#fff9'; g.lineWidth = 5; rr(840, 92, 130, 58, 14); g.stroke(); g.fillStyle = '#fff9'; rr(976, 110, 10, 22, 4); g.fill(); g.fillStyle = '#ff3b30'; rr(850, 102, 12, 38, 4); g.fill();
  // まん中：トークの画面
  const x = st.ng[0] || st.lastOk, ng = !!st.ng[0]; let y = 230;
@@ -789,19 +873,19 @@ async function makeImage() {
   // 相手
   let by = y + 150;
   if (x.r) { g.fillStyle = p.c; g.beginPath(); g.arc(130, by + 46, 44, 0, 6.3); g.fill(); g.font = F(46, 400); g.textAlign = 'center'; g.fillStyle = '#fff'; g.fillText(p.a, 130, by + 50);
-   const tx = cut(x.r, 15); g.font = F(46, 500); const tw = g.measureText(tx).width; g.fillStyle = '#2e3442'; rr(196, by, tw + 64, 96, 40); g.fill(); g.fillStyle = '#fff'; g.textAlign = 'left'; g.fillText(tx, 228, by + 50); by += 150; }
+   const tx = cut(x.r, L === 'en' ? 26 : 15); g.font = F(46, 500); const tw = g.measureText(tx).width; g.fillStyle = '#2e3442'; rr(196, by, tw + 64, 96, 40); g.fill(); g.fillStyle = '#fff'; g.textAlign = 'left'; g.fillText(tx, 228, by + 50); by += 150; }
   // 自分
-  { const tx = cut(x.got, 14); g.font = F(46, 500); const tw = g.measureText(tx).width, bx = W - 90 - (tw + 64); g.fillStyle = '#5bd170'; rr(bx, by, tw + 64, 96, 40); g.fill();
+  { const tx = cut(x.got, L === 'en' ? 24 : 14); g.font = F(46, 500); const tw = g.measureText(tx).width, bx = W - 90 - (tw + 64); g.fillStyle = '#5bd170'; rr(bx, by, tw + 64, 96, 40); g.fill();
    if (ng) { g.strokeStyle = '#ff3b30'; g.lineWidth = 7; rr(bx - 4, by - 4, tw + 72, 104, 44); g.stroke(); }
    g.fillStyle = '#0b1a0e'; g.textAlign = 'left'; g.fillText(tx, bx + 32, by + 50);
-   g.textAlign = 'right'; g.font = F(30, 800); if (ng) { g.fillStyle = '#ff3b30'; g.fillText('誤送信', bx - 18, by + 34); } g.fillStyle = '#8b9098'; g.font = F(26, 500); g.fillText('既読', bx - 18, by + (ng ? 72 : 60)); by += 140; }
-  if (ng) { g.textAlign = 'center'; g.font = F(34, 700); g.fillStyle = '#8b9098'; g.fillText(x.want ? '正しくは「' + cut(x.want, 14) + '」' : 'だれにも頼まれていないのに、送った', W / 2, y + 500); }
-  else { g.textAlign = 'center'; g.font = F(36, 800); g.fillStyle = '#7dff9b'; g.fillText('誤送信 0件', W / 2, y + 500); }
- } else { g.textAlign = 'center'; g.font = F(48, 800); g.fillStyle = '#8b9098'; g.fillText('だれにも返信できなかった…', W / 2, y + 280); }
+   g.textAlign = 'right'; g.font = F(30, 800); if (ng) { g.fillStyle = '#ff3b30'; g.fillText(T.ngL, bx - 18, by + 34); } g.fillStyle = '#8b9098'; g.font = F(26, 500); g.fillText(T.read, bx - 18, by + (ng ? 72 : 60)); by += 140; }
+  if (ng) { g.textAlign = 'center'; g.font = F(34, 700); g.fillStyle = '#8b9098'; g.fillText(x.want ? T.imgWant(cut(x.want, 22)) : T.imgNobody, W / 2, y + 500); }
+  else { g.textAlign = 'center'; g.font = F(36, 800); g.fillStyle = '#7dff9b'; g.fillText(T.imgNg(0), W / 2, y + 500); }
+ } else { g.textAlign = 'center'; g.font = F(48, 800); g.fillStyle = '#8b9098'; g.fillText(T.imgNone, W / 2, y + 280); }
  // 下：結果
- g.textAlign = 'center'; g.font = F(40, 700); g.fillStyle = '#c9ccd2'; g.fillText('バッテリー1%で、LINEのお題を', W / 2, 880);
- { const n = String(st.n); g.font = F(210); const nw = g.measureText(n).width; g.font = F(64); const uw = g.measureText('個クリア').width + 14; const x0 = (W - nw - uw) / 2; g.textAlign = 'left'; g.font = F(210); g.fillStyle = '#ffd33d'; g.fillText(n, x0, 1020); g.font = F(64); g.fillStyle = '#fff'; g.fillText('個クリア', x0 + nw + 14, 1058); }
- g.textAlign = 'center'; g.font = F(40, 700); g.fillStyle = st.ng.length ? '#ff8a80' : '#7dff9b'; g.fillText('誤送信 ' + st.ng.length + '件', W / 2, 1160);
+ g.textAlign = 'center'; g.font = F(40, 700); g.fillStyle = '#c9ccd2'; g.fillText(T.imgHead, W / 2, 880);
+ { const n = String(st.n); g.font = F(210); const nw = g.measureText(n).width; g.font = F(64); const uw = g.measureText(T.imgUnit).width + 14; const x0 = (W - nw - uw) / 2; g.textAlign = 'left'; g.font = F(210); g.fillStyle = '#ffd33d'; g.fillText(n, x0, 1020); g.font = F(64); g.fillStyle = '#fff'; g.fillText(T.imgUnit, x0 + nw + 14, 1058); }
+ g.textAlign = 'center'; g.font = F(40, 700); g.fillStyle = st.ng.length ? '#ff8a80' : '#7dff9b'; g.fillText(T.imgNg(st.ng.length), W / 2, 1160);
  g.font = F(46); g.fillStyle = '#fff'; g.fillText('#残り1パーセント', W / 2, 1250); g.font = F(30, 600); g.fillStyle = '#8b9098'; g.fillText('nasubi-no-oniwa.github.io/battery1', W / 2, 1306);
  const blob = await new Promise(r => c.toBlob(r, 'image/png')); if (!blob) return; const nm = 'nokori1_' + Date.now() + '.png', file = new File([blob], nm, { type: 'image/png' });
  try { if (navigator.canShare && navigator.canShare({ files: [file] })) { const q = quoteURL(); await navigator.share({ files: [file], text: POST + '\n' + SHARE_URL + (q ? '\n' + q : '') }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
@@ -817,8 +901,7 @@ function fit() {
 }
 if (window.visualViewport) { visualViewport.addEventListener('resize', fit); visualViewport.addEventListener('scroll', fit); }
 addEventListener('resize', fit); fit();
-init(); renderList();
-$('q').innerHTML = 'ここにお題が出る';
+setLang(pickLang()); init(); renderList();
 </script>
 </body>
 </html>
